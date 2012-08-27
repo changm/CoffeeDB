@@ -1,8 +1,34 @@
 package coffeedb;
 
+import java.util.ArrayList;
+
 import coffeedb.types.Type;
 
+/***
+ * We're assuming row based schemas here.
+ * Maybe we'll try a column store another day
+ * @author masonchang
+ */
 public class Schema {
-	public String[] columnNames;
-	public Type[] columnTypes;
+	public ArrayList<String> _columnNames;
+	public ArrayList<Type> _columnTypes;
+	
+	public Schema(String[] columns, Type[] types) {
+		assert (columns != null);
+		assert (types != null);
+		
+		_columnNames = new ArrayList<String>();
+		_columnTypes = new ArrayList<Type>();
+		
+		_columnNames.addAll(_columnNames);
+		// For some reason can't do addAll with non bulitin types
+		for (Type t : types) {
+			_columnTypes.add(t);
+		}
+	}
+	
+	public void addColumn(String columnName, Type type) {
+		_columnNames.add(columnName);
+		_columnTypes.add(type);
+	}
 }

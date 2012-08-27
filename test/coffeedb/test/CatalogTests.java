@@ -31,7 +31,8 @@ public class CatalogTests {
 	@Test
 	public void test() {
 		Catalog catalog = CoffeeDB.getInstance().getCatalog();
-		Table table = new Table("TestTable");
+		Schema schema = TestUtil.getSimpleSchema();
+		Table table = new Table("TestTable", schema);
 		catalog.addTable(table);
 		
 		assertTrue(catalog.tableExists(table));

@@ -11,7 +11,7 @@ public class CoffeeDB {
 	
 	public void test() {
 		Catalog catalog = CoffeeDB.getInstance().getCatalog();
-		Table table = new Table("TestTable");
+		Table table = new Table("TestTable", null);
 		catalog.addTable(table);
 	}
 	
