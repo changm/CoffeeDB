@@ -6,4 +6,8 @@ public class QueryPlan {
 	public QueryPlan(SqlParser parser) {
 		_parser = parser;
 	}
+	
+	public void generatePlan() {
+		_parser.parseQuery();
+	}
 }
