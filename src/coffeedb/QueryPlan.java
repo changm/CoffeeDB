@@ -1,13 +1,22 @@
 package coffeedb;
 
+import java.util.ArrayList;
+
+import coffeedb.operators.Operator;
+
 public class QueryPlan {
-	private SqlParser _parser;
+	public ArrayList<Operator> _operators;
 	
-	public QueryPlan(SqlParser parser) {
-		_parser = parser;
+	public QueryPlan() {
+		_operators = new ArrayList<Operator>();
 	}
 	
-	public void generatePlan() {
-		_parser.parseQuery();
+	public ArrayList<Operator> getOperators() {
+		assert (_operators.size() == 1);
+		return _operators;
+	}
+	
+	public void addOperator(Operator op) {
+		_operators.add(op);
 	}
 }

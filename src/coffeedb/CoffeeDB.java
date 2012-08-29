@@ -17,8 +17,10 @@ public class CoffeeDB {
 	
 	public void runQuery(String query) {
 		SqlParser parser = new SqlParser(query);
-		QueryPlan queryPlan = new QueryPlan(parser);
-		queryPlan.generatePlan();
+		QueryPlan plan = parser.generateQueryPlan();
+		
+		ExecutionEngine engine = new ExecutionEngine();
+		engine.runPlan(plan);
 		
 		/*
 		QueryOptimizer optimizer = new QueryOptimizer();
@@ -62,8 +64,8 @@ public class CoffeeDB {
 		CoffeeDB database = CoffeeDB.getInstance();
 		database.setConfig(config);
 		//database.test();
-		//database.runQuery("create table test (a integer, b int)");
-		database.runQuery("select * from test;");
-		database.runQuery("insert into test values (10, 20);");
+		database.runQuery("create table test (a int, b int)");
+		//database.runQuery("select * from test;");
+		//database.runQuery("insert into test values (10, 20);");
 	}
 }

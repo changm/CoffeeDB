@@ -7,6 +7,7 @@ public class ExecutionEngine {
 	}
 	
 	public void runPlan(QueryPlan plan) {
+		assert (plan != null);
 		SqlInterpreter interpreter = new SqlInterpreter();
 		Tuple[] results = interpreter.runPlan(plan);
 		printResults(results);
