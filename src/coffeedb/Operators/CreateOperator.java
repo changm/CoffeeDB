@@ -39,4 +39,7 @@ public class CreateOperator implements Operator {
 		Value[] result = Value.toValueArray(new StringValue("Created table " + _tableName));
 		return new Tuple(result);
 	}
+
+	public void reset() {
+	}
 }

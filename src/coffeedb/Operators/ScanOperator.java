@@ -24,9 +24,11 @@ public class ScanOperator implements Operator {
 		Catalog catalog = CoffeeDB.catalog();
 		Table table = catalog.getTable(_tableName);
 		_iterator = table.getIterator();
+		assert (_iterator != null);
 	}
 
 	public boolean hasNext() {
+		assert (_iterator != null);
 		return _iterator.hasNext();
 	}
 
@@ -35,6 +37,12 @@ public class ScanOperator implements Operator {
 
 	public Tuple next() {
 		assert (_iterator.hasNext());
-		return _iterator.next();
+		Tuple tuple = _iterator.next();
+		assert (tuple != null);
+		return tuple;
+	}
+
+	public void reset() {
+		assert false : "Not yet implemented";
 	}
 }

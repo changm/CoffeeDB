@@ -69,7 +69,7 @@ public class CoffeeDB {
 		database.setConfig(config);
 		//database.test();
 		database.runQuery("create table test (a int, b int)");
+		database.runQuery("insert into test values (10, 20);");
 		database.runQuery("select * from test;");
-		//database.runQuery("insert into test values (10, 20);");
 	}
 }

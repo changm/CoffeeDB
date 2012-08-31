@@ -9,12 +9,16 @@ public abstract class Type {
 	public boolean isInt() { return false; }
 	public boolean isBlob() { return false; }
 	public boolean isString() { return false; }
+	public boolean isLong() { return false; }
 	
 	private static IntType _intType = new IntType();
 	private static StringType _stringType = new StringType();
+	private static LongType _longType = new LongType();
 	
 	public static IntType getIntType() { return _intType; }
 	public static StringType getStringType() { return _stringType; }
+	public static LongType getLongType() { return _longType; }
+	
 	
 	public static Type getType(String typeName) {
 		if (typeName.equalsIgnoreCase("int")) {
@@ -23,6 +27,8 @@ public abstract class Type {
 			return new BlobType();
 		} else if (typeName.equalsIgnoreCase("string")) {
 			return _stringType;
+		} else if (typeName.equalsIgnoreCase("long")) {
+			return _longType;
 		}
 		
 		assert false : "Unknown type : " + typeName;

@@ -20,4 +20,13 @@ public class IntValue extends Value {
 	public Type getType() {
 		return Type.getIntType();
 	}
+
+	@Override
+	public boolean equals(Value other) {
+		if (other instanceof IntValue) {
+			return _value == ((IntValue) other)._value;
+		}
+		
+		return false;
+	}
 }

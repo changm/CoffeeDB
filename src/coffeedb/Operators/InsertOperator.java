@@ -1,5 +1,7 @@
 package coffeedb.operators;
 
+import java.util.ArrayList;
+
 import java.util.Iterator;
 
 import coffeedb.Catalog;
@@ -7,22 +9,30 @@ import coffeedb.CoffeeDB;
 import coffeedb.Table;
 import coffeedb.Tuple;
 import coffeedb.types.Type;
-import coffeedb.values.IntValue;
-import coffeedb.values.Value;
+import coffeedb.values.*;
 
 public class InsertOperator implements Operator {
 	private String _tableName;
 	private Iterable<Tuple> _tuples;
 	private Iterator<Tuple> _tupleIter;
 	
+	public InsertOperator(String tableName, Object...objects) {
+		_tableName = tableName;
+		
+		_tuples = new ArrayList<Tuple>();
+		for (Object o : objects) {
+			((ArrayList<Tuple>) _tuples).add((Tuple) o);
+		}
+		
+	}
 	public InsertOperator(String tableName, Iterable<Tuple> tuples) {
 		_tableName = tableName;
 		assert (tuples != null);
 		_tuples = tuples;
-		_tupleIter = _tuples.iterator();
 	}
 	
 	public void open() {
+		_tupleIter = _tuples.iterator();
 	}
 
 	public boolean hasNext() {
@@ -33,7 +43,8 @@ public class InsertOperator implements Operator {
 	}
 	
 	private Tuple createResultTuple(int insertCount) {
-		Value[] results = Value.toValueArray(new IntValue(insertCount));
+		String resultString = "Inserted " + insertCount + " rows";
+		Value[] results = Value.toValueArray(new StringValue(resultString));
 		return new Tuple(results);
 	}
 
@@ -50,5 +61,9 @@ public class InsertOperator implements Operator {
 		}
 		
 		return createResultTuple(insertCount);
+	}
+	
+	public void reset() {
+		
 	}
 }

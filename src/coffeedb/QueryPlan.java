@@ -7,6 +7,7 @@ import java.util.List;
 import net.sf.jsqlparser.statement.select.SelectItem;
 
 import coffeedb.operators.*;
+import coffeedb.values.Value;
 
 public class QueryPlan {
 	public ArrayList<Operator> _operators;
@@ -34,5 +35,11 @@ public class QueryPlan {
 	public void addCreate(String tableName, Schema tableSchema) {
 		CreateOperator createOp = new CreateOperator(tableName, tableSchema);
 		addOperator(createOp);
+	}
+
+	public void createInsertOperator(String tableName, ArrayList<Value> _values) {
+		Tuple tuple = new Tuple(_values);
+		InsertOperator insert = new InsertOperator(tableName, tuple);
+		addOperator(insert);
 	}
 }

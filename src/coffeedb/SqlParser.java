@@ -1,17 +1,32 @@
 package coffeedb;
 
 import java.io.StringReader;
+
 import java.util.ArrayList;
 import java.util.List;
 
-import coffeedb.operators.CreateOperator;
 import coffeedb.types.Type;
+import coffeedb.values.*;
 
 import net.sf.jsqlparser.*;
+import net.sf.jsqlparser.expression.*;
+import net.sf.jsqlparser.expression.LongValue;
+import net.sf.jsqlparser.expression.StringValue;
+import net.sf.jsqlparser.expression.operators.arithmetic.Addition;
+import net.sf.jsqlparser.expression.operators.arithmetic.BitwiseAnd;
+import net.sf.jsqlparser.expression.operators.arithmetic.BitwiseOr;
+import net.sf.jsqlparser.expression.operators.arithmetic.BitwiseXor;
+import net.sf.jsqlparser.expression.operators.arithmetic.Concat;
+import net.sf.jsqlparser.expression.operators.arithmetic.Division;
+import net.sf.jsqlparser.expression.operators.arithmetic.Multiplication;
+import net.sf.jsqlparser.expression.operators.arithmetic.Subtraction;
+import net.sf.jsqlparser.expression.operators.conditional.AndExpression;
+import net.sf.jsqlparser.expression.operators.conditional.OrExpression;
+import net.sf.jsqlparser.expression.operators.relational.*;
 import net.sf.jsqlparser.parser.CCJSqlParserManager;
+import net.sf.jsqlparser.schema.Column;
 import net.sf.jsqlparser.schema.Table;
-import net.sf.jsqlparser.statement.Statement;
-import net.sf.jsqlparser.statement.StatementVisitor;
+import net.sf.jsqlparser.statement.*;
 import net.sf.jsqlparser.statement.create.table.ColDataType;
 import net.sf.jsqlparser.statement.create.table.ColumnDefinition;
 import net.sf.jsqlparser.statement.create.table.CreateTable;
@@ -19,20 +34,7 @@ import net.sf.jsqlparser.statement.delete.Delete;
 import net.sf.jsqlparser.statement.drop.Drop;
 import net.sf.jsqlparser.statement.insert.Insert;
 import net.sf.jsqlparser.statement.replace.Replace;
-import net.sf.jsqlparser.statement.select.AllColumns;
-import net.sf.jsqlparser.statement.select.AllTableColumns;
-import net.sf.jsqlparser.statement.select.FromItem;
-import net.sf.jsqlparser.statement.select.FromItemVisitor;
-import net.sf.jsqlparser.statement.select.PlainSelect;
-import net.sf.jsqlparser.statement.select.Select;
-import net.sf.jsqlparser.statement.select.SelectBody;
-import net.sf.jsqlparser.statement.select.SelectExpressionItem;
-import net.sf.jsqlparser.statement.select.SelectItem;
-import net.sf.jsqlparser.statement.select.SelectItemVisitor;
-import net.sf.jsqlparser.statement.select.SelectVisitor;
-import net.sf.jsqlparser.statement.select.SubJoin;
-import net.sf.jsqlparser.statement.select.SubSelect;
-import net.sf.jsqlparser.statement.select.Union;
+import net.sf.jsqlparser.statement.select.*;
 import net.sf.jsqlparser.statement.truncate.Truncate;
 import net.sf.jsqlparser.statement.update.Update;
 
@@ -76,7 +78,8 @@ public class SqlParser implements StatementVisitor {
 	}
 
 	public void visit(Insert insert) {
-		assert (false);
+		Table table = insert.getTable();
+		insert.getItemsList().accept(new InsertDataPlan(table));
 	}
 
 	public void visit(CreateTable create) {
@@ -172,5 +175,243 @@ public class SqlParser implements StatementVisitor {
 	}
 	/*** END SELECT QUERY PLAN ***/
 	
+	class InsertDataPlan implements ItemsListVisitor, ExpressionVisitor {
+		private Table _table;
+		private ArrayList<Value> _values;
+		public InsertDataPlan(Table table) {
+			_table = table;
+			_values = new ArrayList<Value>();
+		}
 
+		public void visit(SubSelect subSelect) {
+			assert (false);
+		}
+
+		public void visit(ExpressionList expressions) {
+			for (Expression expression : expressions.getExpressions()) {
+				expression.accept(this);
+			}
+			
+			_queryPlan.createInsertOperator(_table.getName(), _values);
+		}
+
+		public void visit(NullValue nullVal) {
+			assert (false);
+		}
+
+		public void visit(Function function) {
+			assert (false);
+		}
+
+		public void visit(InverseExpression arg0) {
+			assert (false);
+		}
+
+		public void visit(JdbcParameter arg0) {
+			assert (false);
+		}
+
+		public void visit(DoubleValue arg0) {
+			assert (false);
+		}
+
+		public void visit(LongValue longValue) {
+			long value = longValue.getValue();
+			if (value == (int) value) {
+				_values.add(new IntValue((int) value));
+			} else {
+				_values.add(new coffeedb.values.LongValue(value));
+			}
+		}
+
+		public void visit(DateValue arg0) {
+			assert false;
+			
+		}
+
+		public void visit(TimeValue arg0) {
+			assert false;
+			
+		}
+
+		public void visit(TimestampValue arg0) {
+			assert false;
+			
+		}
+
+		@Override
+		public void visit(Parenthesis arg0) {
+			assert false;
+			
+		}
+
+		@Override
+		public void visit(StringValue arg0) {
+			assert false;
+		}
+
+		@Override
+		public void visit(Addition arg0) {
+			assert false;
+			
+		}
+
+		@Override
+		public void visit(Division arg0) {
+			assert false;
+			
+		}
+
+		@Override
+		public void visit(Multiplication arg0) {
+			assert false;
+			
+		}
+
+		@Override
+		public void visit(Subtraction arg0) {
+			assert false;
+			
+		}
+
+		@Override
+		public void visit(AndExpression arg0) {
+			assert false;
+			
+		}
+
+		@Override
+		public void visit(OrExpression arg0) {
+			assert false;
+			
+		}
+
+		@Override
+		public void visit(Between arg0) {
+			assert false;
+			
+		}
+
+		@Override
+		public void visit(EqualsTo arg0) {
+			assert false;
+			
+		}
+
+		@Override
+		public void visit(GreaterThan arg0) {
+			assert false;
+			
+		}
+
+		@Override
+		public void visit(GreaterThanEquals arg0) {
+			assert false;
+			
+		}
+
+		@Override
+		public void visit(InExpression arg0) {
+			assert false;
+			
+		}
+
+		@Override
+		public void visit(IsNullExpression arg0) {
+			assert false;
+			
+		}
+
+		@Override
+		public void visit(LikeExpression arg0) {
+			assert false;
+			
+		}
+
+		@Override
+		public void visit(MinorThan arg0) {
+			assert false;
+			
+		}
+
+		@Override
+		public void visit(MinorThanEquals arg0) {
+			assert false;
+			
+		}
+
+		@Override
+		public void visit(NotEqualsTo arg0) {
+			assert false;
+			
+		}
+
+		@Override
+		public void visit(Column arg0) {
+			assert false;
+			
+		}
+
+		@Override
+		public void visit(CaseExpression arg0) {
+			assert false;
+			
+		}
+
+		@Override
+		public void visit(WhenClause arg0) {
+			assert false;
+			
+		}
+
+		@Override
+		public void visit(ExistsExpression arg0) {
+			assert false;
+			
+		}
+
+		@Override
+		public void visit(AllComparisonExpression arg0) {
+			assert false;
+			
+		}
+
+		@Override
+		public void visit(AnyComparisonExpression arg0) {
+			assert false;
+			
+		}
+
+		@Override
+		public void visit(Concat arg0) {
+			assert false;
+			
+		}
+
+		@Override
+		public void visit(Matches arg0) {
+			assert false;
+			
+		}
+
+		@Override
+		public void visit(BitwiseAnd arg0) {
+			assert false;
+			
+		}
+
+		@Override
+		public void visit(BitwiseOr arg0) {
+			assert false;
+			
+		}
+
+		@Override
+		public void visit(BitwiseXor arg0) {
+			assert false;
+			
+		}
 	}
+	
+
+	} // end SqlParser file

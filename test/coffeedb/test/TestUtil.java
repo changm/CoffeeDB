@@ -1,6 +1,7 @@
 package coffeedb.test;
 
 import coffeedb.*;
+import coffeedb.operators.ScanOperator;
 import coffeedb.types.*;
 import coffeedb.values.IntValue;
 import coffeedb.values.Value;
@@ -31,5 +32,16 @@ public class TestUtil {
 		Value intValue = new IntValue(10);
 		Value[] values = Value.toValueArray(intValue);
 		return new Tuple(values);
+	}
+	
+	public static boolean tupleExists(String tableName, Tuple tuple) {
+		ScanOperator scan = new ScanOperator(tableName);
+		scan.open();
+		while (scan.hasNext()) {
+			Tuple t = scan.next();
+			if (t.equals(tuple)) return true;
+		}
+		scan.close();
+		return false;
 	}
 }

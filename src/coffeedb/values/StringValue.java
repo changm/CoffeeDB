@@ -20,4 +20,14 @@ public class StringValue extends Value {
 	public String toString() {
 		return _value;
 	}
+
+	public boolean equals(Value other) {
+		if (other instanceof StringValue) {
+			return _value.equals(((StringValue)other)._value);
+		}
+		
+		return false;
+	}
+	
+	
 }
