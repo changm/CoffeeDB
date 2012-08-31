@@ -27,14 +27,33 @@ public class CatalogTests {
 	@After
 	public void tearDown() throws Exception {
 	}
-
+	
 	@Test
-	public void test() {
+	public void testCreateTable() {
 		Catalog catalog = CoffeeDB.getInstance().getCatalog();
 		Schema schema = TestUtil.getSimpleSchema();
 		Table table = new Table("TestTable", schema);
 		catalog.addTable(table);
 		
 		assertTrue(catalog.tableExists(table));
+	}
+	
+	@Test
+	public void testDeleteTable() {
+		Catalog catalog = CoffeeDB.catalog();
+		String tableName = "test";
+		catalog.addTable(TestUtil.getSimpleTable(tableName));
+		assertTrue(catalog.tableExists(tableName));
+		
+		assertTrue(catalog.deleteTable(tableName));
+		assertFalse(catalog.tableExists(tableName));
+	}
+	
+	@Test
+	public void cannotDeleteTest() {
+		Catalog catalog = CoffeeDB.catalog();
+		
+		String tableName = "test";
+		assertFalse(catalog.deleteTable(tableName));
 	}
 }

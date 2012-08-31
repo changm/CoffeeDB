@@ -36,4 +36,9 @@ public class Catalog {
 	public void clean() {
 		_tables.clear();
 	}
+	
+	public boolean deleteTable(String tableName) {
+		Object delete = _tables.remove(tableName);
+		return delete != null;
+	}
 }

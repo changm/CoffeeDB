@@ -10,42 +10,20 @@ import coffeedb.values.Value;
  * @author masonchang
  */
 public class Tuple {
-	private Type[] _types;
 	private Value[] _values;
 	
-	public Tuple(Type[] type) {
-		assert (type != null);
-		_types = type;
-		_values = new Value[type.length];
-	}
-	
-	public Tuple(Type[] types, Value[] values) {
-		_types = types;
+	public Tuple(Value[] values) {
 		_values = values;
-		consistencyCheck();
-	}
-	
-	private void consistencyCheck() {
-		assert (_types.length == _values.length);
-		for (int i = 0; i < _types.length; i++) {
-			Type type = _types[i];
-			Type valueType = _values[i].getType();
-			assert (type.equals(valueType));
-		}
 	}
 	
 	public void setValue(int field, Value value) {
-		assert (field < _types.length);
+		assert (field < _values.length);
 		_values[field] = value;
 	}
 	
 	public Value getValue(int field) {
-		assert (field < _types.length);
+		assert (field < _values.length);
 		return _values[field];
-	}
-	
-	public Type[] getType() {
-		return _types;
 	}
 	
 	public String toString() {

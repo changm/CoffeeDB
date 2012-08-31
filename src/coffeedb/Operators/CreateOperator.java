@@ -36,11 +36,7 @@ public class CreateOperator implements Operator {
 	}
 
 	private Tuple createSuccessTuple() {
-		Type stringType = Type.getStringType();
-		Type[] tupleType = Type.toTypeArray(stringType);
-		
-		Tuple result = new Tuple(tupleType);
-		result.setValue(0, new StringValue("Created table " + _tableName));
-		return result;
+		Value[] result = Value.toValueArray(new StringValue("Created table " + _tableName));
+		return new Tuple(result);
 	}
 }

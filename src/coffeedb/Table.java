@@ -34,4 +34,8 @@ public class Table {
 		// reference. Or somehow make read only
 		return _data.iterator();
 	}
+
+	public synchronized boolean hasTuple(Tuple testTuple) {
+		return _data.contains(testTuple);
+	}
 }

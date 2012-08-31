@@ -33,9 +33,8 @@ public class InsertOperator implements Operator {
 	}
 	
 	private Tuple createResultTuple(int insertCount) {
-		Type[] resultType = Type.toTypeArray(Type.getIntType());
 		Value[] results = Value.toValueArray(new IntValue(insertCount));
-		return new Tuple(resultType, results);
+		return new Tuple(results);
 	}
 
 	public Tuple next() {
