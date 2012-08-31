@@ -15,13 +15,15 @@ public class SqlInterpreter {
 	public Tuple[] runPlan(QueryPlan plan) {
 		ArrayList<Operator> operators = plan.getOperators();
 		assert (operators.size() == 1);
-		Tuple[] result = new Tuple[1];
+		ArrayList<Tuple> results = new ArrayList<Tuple>();
 	
 		Operator operator = operators.get(0);
 		operator.open();
-		result[0] = operator.getNext();
+		while (operator.hasNext()) {
+			results.add(operator.next());
+		}
 		operator.close();
 		
-		return result;
+		return results.toArray(new Tuple[results.size()]);
 	}
 }

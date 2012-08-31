@@ -19,13 +19,13 @@ public class CreateOperator implements Operator {
 	}
 
 	public boolean hasNext() {
-		return _didCreateTable;
+		return !_didCreateTable;
 	}
 
 	public void close() {
 	}
 
-	public Tuple getNext() {
+	public Tuple next() {
 		CoffeeDB db = CoffeeDB.getInstance();
 		Catalog catalog = db.getCatalog();
 		

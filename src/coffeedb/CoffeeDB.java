@@ -31,6 +31,10 @@ public class CoffeeDB {
 		*/
 	}
 	
+	public static Catalog catalog() {
+		return getInstance().getCatalog();
+	}
+	
 	public static CoffeeDB getInstance() {
 		if (_singleton == null) {
 			_singleton = new CoffeeDB();
@@ -65,7 +69,7 @@ public class CoffeeDB {
 		database.setConfig(config);
 		//database.test();
 		database.runQuery("create table test (a int, b int)");
-		//database.runQuery("select * from test;");
+		database.runQuery("select * from test;");
 		//database.runQuery("insert into test values (10, 20);");
 	}
 }

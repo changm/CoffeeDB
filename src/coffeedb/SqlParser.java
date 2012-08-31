@@ -2,6 +2,7 @@ package coffeedb;
 
 import java.io.StringReader;
 import java.util.ArrayList;
+import java.util.List;
 
 import coffeedb.operators.CreateOperator;
 import coffeedb.types.Type;
@@ -18,14 +19,24 @@ import net.sf.jsqlparser.statement.delete.Delete;
 import net.sf.jsqlparser.statement.drop.Drop;
 import net.sf.jsqlparser.statement.insert.Insert;
 import net.sf.jsqlparser.statement.replace.Replace;
+import net.sf.jsqlparser.statement.select.AllColumns;
+import net.sf.jsqlparser.statement.select.AllTableColumns;
+import net.sf.jsqlparser.statement.select.FromItem;
+import net.sf.jsqlparser.statement.select.FromItemVisitor;
 import net.sf.jsqlparser.statement.select.PlainSelect;
 import net.sf.jsqlparser.statement.select.Select;
+import net.sf.jsqlparser.statement.select.SelectBody;
+import net.sf.jsqlparser.statement.select.SelectExpressionItem;
+import net.sf.jsqlparser.statement.select.SelectItem;
+import net.sf.jsqlparser.statement.select.SelectItemVisitor;
 import net.sf.jsqlparser.statement.select.SelectVisitor;
+import net.sf.jsqlparser.statement.select.SubJoin;
+import net.sf.jsqlparser.statement.select.SubSelect;
 import net.sf.jsqlparser.statement.select.Union;
 import net.sf.jsqlparser.statement.truncate.Truncate;
 import net.sf.jsqlparser.statement.update.Update;
 
-public class SqlParser implements SelectVisitor, StatementVisitor {
+public class SqlParser implements StatementVisitor {
 	private String _query;
 	private QueryPlan _queryPlan;
 	
@@ -49,12 +60,11 @@ public class SqlParser implements SelectVisitor, StatementVisitor {
 		return _queryPlan;
 	}
 
-	public void visit(PlainSelect select) {
-		assert (false);
-	}
-
 	public void visit(Select select) {
-		assert (false);
+		SelectQueryPlan selectData = new SelectQueryPlan();
+		SelectBody body = select.getSelectBody();
+		body.accept(selectData);
+		_queryPlan.addSelect(selectData.getTableName(), selectData.getColumns());
 	}
 
 	public void visit(Delete delete) {
@@ -92,23 +102,75 @@ public class SqlParser implements SelectVisitor, StatementVisitor {
 		}
 		
 		Schema tableSchema = new Schema(columnNames, columnTypes);
-		CreateOperator createOp = new CreateOperator(tableName, tableSchema);
-		_queryPlan.addOperator(createOp);
+		_queryPlan.addCreate(tableName, tableSchema);
 	}
 	
 	public void visit(Drop drop) {
 		assert (false);
 	}
-		
-	public void visit(Replace replace) {
-		assert (false);
+	
+	public void visit(Replace arg0) {
 	}
 
-	public void visit(Truncate truncate) {
-		assert (false);
+	public void visit(Truncate arg0) {
 	}
+		
+	/***
+	 * Visitor dedicated to creating query plans for SELECT statements
+	 * @author masonchang
+	 *
+	 */
+	class SelectQueryPlan implements SelectVisitor, SelectItemVisitor, FromItemVisitor {
+		private String _tableName;
+		private ArrayList<String> _columns;
+		public SelectQueryPlan() {
+			_columns = new ArrayList<String>();
+		}
+		
+		public void visit(AllColumns allColumns) {
+			_columns.add(allColumns.toString());
+		}
+
+		public void visit(AllTableColumns arg0) {
+			assert (false);
+		}
+
+		public void visit(SelectExpressionItem arg0) {
+			assert (false);
+		}
+
+		public void visit(PlainSelect plainSelect) {
+			plainSelect.getFromItem().accept(this);
+			for (SelectItem item : plainSelect.getSelectItems()) {
+				item.accept(this);
+			}
+		}
+
+		public void visit(Union arg0) {
+			assert (false);
+		}
+
+		public void visit(Table table) {
+			_tableName = table.getName();
+		}
+
+		public void visit(SubSelect arg0) {
+			assert (false);
+		}
+
+		public void visit(SubJoin arg0) {
+			assert (false);
+		}
+		
+		public String getTableName() {
+			return _tableName;
+		}
+		
+		public ArrayList<String> getColumns() {
+			return _columns;
+		}
+	}
+	/*** END SELECT QUERY PLAN ***/
 	
-	public void visit(Union union) {
-		assert (false);
+
 	}
-}
