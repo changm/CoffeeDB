@@ -17,19 +17,17 @@ public class QueryPlan {
 	}
 	
 	public ArrayList<Operator> getOperators() {
-		assert (_operators.size() == 1);
 		return _operators;
 	}
 	
 	private void addOperator(Operator op) {
-		_operators.add(op);
+		_operators.add(0, op);
 	}
 
-	public void addSelect(String tableName, ArrayList<String> columns) {
+	public ScanOperator addSelect(String tableName, ArrayList<String> columns) {
 		ScanOperator scan = new ScanOperator(tableName);
 		addOperator(scan);
-		
-		//FilterOperator filter = new FilterOperator(scan);
+		return scan;
 	}
 	
 	public void addCreate(String tableName, Schema tableSchema) {
@@ -41,5 +39,11 @@ public class QueryPlan {
 		Tuple tuple = new Tuple(_values);
 		InsertOperator insert = new InsertOperator(tableName, tuple);
 		addOperator(insert);
+	}
+	
+	public FilterOperator addWhere(ScanOperator scan, Comparison compare) {
+		FilterOperator filter = new FilterOperator(compare, scan);
+		addOperator(filter);
+		return filter;
 	}
 }

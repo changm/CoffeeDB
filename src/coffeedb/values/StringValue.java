@@ -1,5 +1,6 @@
 package coffeedb.values;
 
+import coffeedb.operators.Predicate;
 import coffeedb.types.Type;
 
 public class StringValue extends Value {
@@ -28,6 +29,9 @@ public class StringValue extends Value {
 		
 		return false;
 	}
-	
-	
+
+	public boolean compare(Predicate filter, IntValue value) {
+		assert false : "Not yet implemented";
+		return false;
+	}
 }

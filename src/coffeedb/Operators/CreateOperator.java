@@ -35,7 +35,9 @@ public class CreateOperator extends Operator {
 
 	private Tuple createSuccessTuple() {
 		Value[] result = Value.toValueArray(new StringValue("Created table " + _tableName));
-		return new Tuple(result);
+		Schema stringSchema = new Schema();
+		stringSchema.addColumn("Result", Type.getStringType());
+		return new Tuple(stringSchema, result);
 	}
 
 	public void reset() {

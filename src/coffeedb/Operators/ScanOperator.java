@@ -9,13 +9,14 @@ import coffeedb.Tuple;
 
 /***
  * SeqScan operator
+ * 
  * @author masonchang
- *
+ * 
  */
 public class ScanOperator extends Operator {
 	private String _tableName;
 	private Iterator<Tuple> _iterator;
-	
+
 	public ScanOperator(String tableName) {
 		_tableName = tableName;
 	}
@@ -31,7 +32,8 @@ public class ScanOperator extends Operator {
 	}
 
 	public Tuple getNext() {
-		if (!_iterator.hasNext()) return null;
+		if (!_iterator.hasNext())
+			return null;
 		Tuple tuple = _iterator.next();
 		assert (tuple != null);
 		return tuple;

@@ -31,7 +31,10 @@ public class TestUtil {
 	public static Tuple createSimpleTuple() {
 		Value intValue = new IntValue(10);
 		Value[] values = Value.toValueArray(intValue);
-		return new Tuple(values);
+		
+		Schema schema = new Schema();
+		schema.addColumn("intVal", Type.getIntType());
+		return new Tuple(schema, values);
 	}
 	
 	public static boolean tupleExists(String tableName, Tuple tuple) {

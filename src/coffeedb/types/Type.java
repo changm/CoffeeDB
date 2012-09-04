@@ -46,4 +46,8 @@ public abstract class Type {
 		
 		return typeArray;
 	}
+	
+	public boolean equals(Type type) {
+		return this == type;
+	}
 }

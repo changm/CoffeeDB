@@ -14,7 +14,6 @@ public class SqlInterpreter {
 	
 	public Tuple[] runPlan(QueryPlan plan) {
 		ArrayList<Operator> operators = plan.getOperators();
-		assert (operators.size() == 1);
 		ArrayList<Tuple> results = new ArrayList<Tuple>();
 	
 		Operator operator = operators.get(0);

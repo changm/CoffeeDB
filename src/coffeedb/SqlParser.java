@@ -4,7 +4,12 @@ import java.io.StringReader;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Stack;
 
+import coffeedb.operators.Comparison;
+import coffeedb.operators.Operator;
+import coffeedb.operators.Predicate;
+import coffeedb.operators.ScanOperator;
 import coffeedb.types.Type;
 import coffeedb.values.*;
 
@@ -63,10 +68,14 @@ public class SqlParser implements StatementVisitor {
 	}
 
 	public void visit(Select select) {
-		SelectQueryPlan selectData = new SelectQueryPlan();
+		SelectQueryPlan selectData = new SelectQueryPlan(_queryPlan);
 		SelectBody body = select.getSelectBody();
 		body.accept(selectData);
-		_queryPlan.addSelect(selectData.getTableName(), selectData.getColumns());
+		
+		ScanOperator scan = _queryPlan.addSelect(selectData.getTableName(), selectData.getColumns());
+		if (selectData._whereClause != null) {
+			_queryPlan.addWhere(scan, selectData._whereClause);
+		}
 	}
 
 	public void visit(Delete delete) {
@@ -126,8 +135,12 @@ public class SqlParser implements StatementVisitor {
 	class SelectQueryPlan implements SelectVisitor, SelectItemVisitor, FromItemVisitor {
 		private String _tableName;
 		private ArrayList<String> _columns;
-		public SelectQueryPlan() {
+		private Comparison _whereClause;
+		private QueryPlan _queryPlan;
+		
+		public SelectQueryPlan(QueryPlan queryPlan) {
 			_columns = new ArrayList<String>();
+			_queryPlan = queryPlan;
 		}
 		
 		public void visit(AllColumns allColumns) {
@@ -146,6 +159,14 @@ public class SqlParser implements StatementVisitor {
 			plainSelect.getFromItem().accept(this);
 			for (SelectItem item : plainSelect.getSelectItems()) {
 				item.accept(this);
+			}
+			
+			
+			Expression whereClause = plainSelect.getWhere();
+			if (whereClause != null) {
+				ExpressionPlan where = new ExpressionPlan();
+				whereClause.accept(where);
+				_whereClause = (Comparison) where._result;
 			}
 		}
 
@@ -172,9 +193,237 @@ public class SqlParser implements StatementVisitor {
 		public ArrayList<String> getColumns() {
 			return _columns;
 		}
+		
+		public Comparison getWhere() {
+			return _whereClause;
+		}
 	}
 	/*** END SELECT QUERY PLAN ***/
 	
+	class ExpressionPlan implements ExpressionVisitor {
+		private Stack<Value> _values;
+		Operator _op;
+		public Object _result;
+		
+		public ExpressionPlan() {
+			_values = new Stack<Value>();
+		}
+		
+		public void visit(NullValue arg0) {
+			assert false : "Not yet implemented";
+		}
+
+		@Override
+		public void visit(Function arg0) {
+			assert false : "Not yet implemented";
+		}
+
+		@Override
+		public void visit(InverseExpression arg0) {
+			assert false : "Not yet implemented";
+		}
+
+		@Override
+		public void visit(JdbcParameter arg0) {
+			assert false : "Not yet implemented";
+		}
+
+		@Override
+		public void visit(DoubleValue arg0) {
+			assert false : "Not yet implemented";
+		}
+
+		@Override
+		public void visit(LongValue longValue) {
+			long value = longValue.getValue();
+			if (value == (int) value) {
+				_values.push(new IntValue((int)value));
+			} else {
+				_values.push(new coffeedb.values.LongValue(value));
+			}
+		}
+
+		@Override
+		public void visit(DateValue arg0) {
+			assert false : "Not yet implemented";
+		}
+
+		@Override
+		public void visit(TimeValue arg0) {
+			assert false : "Not yet implemented";
+		}
+
+		@Override
+		public void visit(TimestampValue arg0) {
+			assert false : "Not yet implemented";
+		}
+
+		@Override
+		public void visit(Parenthesis arg0) {
+			assert false : "Not yet implemented";
+		}
+
+		@Override
+		public void visit(StringValue arg0) {
+			assert false : "Not yet implemented";
+		}
+
+		@Override
+		public void visit(Addition arg0) {
+			assert false : "Not yet implemented";
+		}
+
+		@Override
+		public void visit(Division arg0) {
+			assert false : "Not yet implemented";
+		}
+
+		@Override
+		public void visit(Multiplication arg0) {
+			assert false : "Not yet implemented";
+		}
+
+		@Override
+		public void visit(Subtraction arg0) {
+			assert false : "Not yet implemented";
+		}
+
+		@Override
+		public void visit(AndExpression arg0) {
+			assert false : "Not yet implemented";
+		}
+
+		@Override
+		public void visit(OrExpression arg0) {
+			assert false : "Not yet implemented";
+		}
+
+		@Override
+		public void visit(Between arg0) {
+			assert false : "Not yet implemented";
+		}
+
+		@Override
+		public void visit(EqualsTo arg0) {
+			assert false : "Not yet implemented";
+		}
+
+		@Override
+		public void visit(GreaterThan arg0) {
+			assert false : "Not yet implemented";
+		}
+
+		@Override
+		public void visit(GreaterThanEquals arg0) {
+			assert false : "Not yet implemented";
+		}
+
+		@Override
+		public void visit(InExpression arg0) {
+			assert false : "Not yet implemented";
+		}
+
+		@Override
+		public void visit(IsNullExpression arg0) {
+			assert false : "Not yet implemented";
+		}
+
+		@Override
+		public void visit(LikeExpression arg0) {
+			assert false : "Not yet implemented";
+		}
+
+		@Override
+		public void visit(MinorThan lessThan) {
+			Expression left = lessThan.getLeftExpression();
+			Expression right = lessThan.getRightExpression();
+			left.accept(this);
+			right.accept(this);
+			
+			Predicate op = Predicate.LESS;
+			Value rightVal = _values.pop();
+			Value leftVal = _values.pop();
+			
+			_result = new Comparison(op, leftVal, rightVal);
+		}
+
+		@Override
+		public void visit(MinorThanEquals arg0) {
+			assert false : "Not yet implemented";
+		}
+
+		@Override
+		public void visit(NotEqualsTo arg0) {
+			assert false : "Not yet implemented";
+		}
+
+		public void visit(Column column) {
+			String columnName = column.getColumnName();
+			_values.push(new coffeedb.values.StringValue(columnName));
+		}
+
+		@Override
+		public void visit(SubSelect arg0) {
+			assert false : "Not yet implemented";
+		}
+
+		@Override
+		public void visit(CaseExpression arg0) {
+			assert false : "Not yet implemented";
+		}
+
+		@Override
+		public void visit(WhenClause arg0) {
+			assert false : "Not yet implemented";
+		}
+
+		@Override
+		public void visit(ExistsExpression arg0) {
+			assert false : "Not yet implemented";
+		}
+
+		@Override
+		public void visit(AllComparisonExpression arg0) {
+			assert false : "Not yet implemented";
+		}
+
+		@Override
+		public void visit(AnyComparisonExpression arg0) {
+			assert false : "Not yet implemented";
+		}
+
+		@Override
+		public void visit(Concat arg0) {
+			assert false : "Not yet implemented";
+		}
+
+		@Override
+		public void visit(Matches arg0) {
+			assert false : "Not yet implemented";
+		}
+
+		@Override
+		public void visit(BitwiseAnd arg0) {
+			assert false : "Not yet implemented";
+		}
+
+		@Override
+		public void visit(BitwiseOr arg0) {
+			assert false : "Not yet implemented";
+		}
+
+		@Override
+		public void visit(BitwiseXor arg0) {
+			assert false : "Not yet implemented";
+		}
+		
+	}
+	
+	/***
+	 * Begin Insert Data Plan
+	 * @author masonchang
+	 *
+	 */
 	class InsertDataPlan implements ItemsListVisitor, ExpressionVisitor {
 		private Table _table;
 		private ArrayList<Value> _values;
@@ -411,6 +660,7 @@ public class SqlParser implements StatementVisitor {
 			assert false;
 			
 		}
+		/*** End Insert Data Plan ***/
 	}
 	
 

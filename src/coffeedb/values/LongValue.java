@@ -1,5 +1,6 @@
 package coffeedb.values;
 
+import coffeedb.operators.Predicate;
 import coffeedb.types.Type;
 
 public class LongValue extends Value {
@@ -22,6 +23,12 @@ public class LongValue extends Value {
 			return _value == ((LongValue)other)._value;
 		}
 		
+		return false;
+	}
+
+	@Override
+	public boolean compare(Predicate filter, IntValue value) {
+		assert false : "Not yet implemented";
 		return false;
 	}
 }

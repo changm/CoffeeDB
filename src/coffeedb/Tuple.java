@@ -13,13 +13,27 @@ import coffeedb.values.Value;
  */
 public class Tuple {
 	private Value[] _values;
+	private Schema _schema;
 	
-	public Tuple(Object...objects) {
+	public Tuple(Schema schema, Object...objects) {
 		_values = Value.createValueArray(objects);
+		_schema = schema;
+		consistencyCheck();
 	}
 	
-	public Tuple(Value[] values) {
+	public Tuple(Schema schema, Value[] values) {
 		_values = values;
+		_schema = schema;
+		consistencyCheck();
+	}
+	
+	private void consistencyCheck() {
+		for (int i = 0; i < _values.length; i++) {
+			Value value = _values[i];
+			Type schemaType = _schema._columnTypes.get(i);
+			assert (schemaType.equals(value.getType()));
+		}
+		
 	}
 	
 	public Tuple(Iterable<Value> values) {
@@ -61,5 +75,15 @@ public class Tuple {
 		}
 		
 		return true;
+	}
+	
+	public int getIndex(String columnName) {
+		for (int i = 0; i < _schema._columnNames.size(); i++) {
+			String column = _schema._columnNames.get(i);
+			if (column.equalsIgnoreCase(columnName)) return i;
+		}
+		
+		assert false : "Unknown column";
+		return -1;
 	}
 }

@@ -44,8 +44,32 @@ public abstract class Value {
 		
 		return toValueArray(values.toArray());
 	}
-	public boolean compare(Predicate _filter, Value _comparison) {
-		assert false : "Not yet implemented";
+	public boolean compare(Predicate filter, Value comparison) {
+		switch (filter) {
+		case EQUALS:
+			assert false : "Not yet implemented";
+			break;
+		case GREATER:
+			assert false : "Not yet implemented";
+			break;
+		case GREATER_OR_EQ:
+			assert false : "Not yet implemented";
+			break;
+		case LESS:
+			return comparison.compare(filter, this);
+		case LESS_OR_EQ:
+			assert false : "Not yet implemented";
+			break;
+		case NOT_EQUALS:
+			assert false : "Not yet implemented";
+			break;
+		default:
+			assert false : "Not yet implemented";
+			break;
+		}
+		
 		return false;
 	}
+	
+	public abstract boolean compare(Predicate filter, IntValue value);
 }

@@ -71,5 +71,8 @@ public class CoffeeDB {
 		database.runQuery("create table test (a int, b int)");
 		database.runQuery("insert into test values (10, 20);");
 		database.runQuery("select * from test;");
+		
+		System.out.println("Running where");
+		database.runQuery("select * from test where test.a < 15");
 	}
 }

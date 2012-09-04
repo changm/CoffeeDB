@@ -6,6 +6,7 @@ import java.util.Iterator;
 
 import coffeedb.Catalog;
 import coffeedb.CoffeeDB;
+import coffeedb.Schema;
 import coffeedb.Table;
 import coffeedb.Tuple;
 import coffeedb.types.Type;
@@ -43,7 +44,10 @@ public class InsertOperator extends Operator {
 	private Tuple createResultTuple(int insertCount) {
 		String resultString = "Inserted " + insertCount + " rows";
 		Value[] results = Value.toValueArray(new StringValue(resultString));
-		return new Tuple(results);
+		
+		Schema schema = new Schema();
+		schema.addColumn("result", Type.getStringType());
+		return new Tuple(schema, results);
 	}
 
 	public Tuple getNext() {
