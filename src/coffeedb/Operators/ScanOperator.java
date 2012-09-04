@@ -12,7 +12,7 @@ import coffeedb.Tuple;
  * @author masonchang
  *
  */
-public class ScanOperator implements Operator {
+public class ScanOperator extends Operator {
 	private String _tableName;
 	private Iterator<Tuple> _iterator;
 	
@@ -27,16 +27,11 @@ public class ScanOperator implements Operator {
 		assert (_iterator != null);
 	}
 
-	public boolean hasNext() {
-		assert (_iterator != null);
-		return _iterator.hasNext();
-	}
-
 	public void close() {
 	}
 
-	public Tuple next() {
-		assert (_iterator.hasNext());
+	public Tuple getNext() {
+		if (!_iterator.hasNext()) return null;
 		Tuple tuple = _iterator.next();
 		assert (tuple != null);
 		return tuple;

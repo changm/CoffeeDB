@@ -11,13 +11,15 @@ import coffeedb.Tuple;
 import coffeedb.types.Type;
 import coffeedb.values.*;
 
-public class InsertOperator implements Operator {
+public class InsertOperator extends Operator {
 	private String _tableName;
 	private Iterable<Tuple> _tuples;
 	private Iterator<Tuple> _tupleIter;
+	private boolean _didInsert;
 	
 	public InsertOperator(String tableName, Object...objects) {
 		_tableName = tableName;
+		_didInsert = false;
 		
 		_tuples = new ArrayList<Tuple>();
 		for (Object o : objects) {
@@ -35,10 +37,6 @@ public class InsertOperator implements Operator {
 		_tupleIter = _tuples.iterator();
 	}
 
-	public boolean hasNext() {
-		return _tupleIter.hasNext();
-	}
-
 	public void close() {
 	}
 	
@@ -48,8 +46,9 @@ public class InsertOperator implements Operator {
 		return new Tuple(results);
 	}
 
-	public Tuple next() {
-		assert (hasNext());
+	public Tuple getNext() {
+		if (_didInsert) return null;
+		
 		int insertCount = 0;
 		Catalog catalog = CoffeeDB.catalog();
 		Table table = catalog.getTable(_tableName);
@@ -60,6 +59,7 @@ public class InsertOperator implements Operator {
 			insertCount++;
 		}
 		
+		_didInsert = true;
 		return createResultTuple(insertCount);
 	}
 	

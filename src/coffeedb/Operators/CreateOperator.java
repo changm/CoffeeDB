@@ -4,7 +4,7 @@ import coffeedb.values.*;
 import coffeedb.*;
 import coffeedb.types.Type;
 
-public class CreateOperator implements Operator {
+public class CreateOperator extends Operator {
 	private String _tableName;
 	private Schema _schema;
 	private boolean _didCreateTable;
@@ -18,14 +18,12 @@ public class CreateOperator implements Operator {
 	public void open() {
 	}
 
-	public boolean hasNext() {
-		return !_didCreateTable;
-	}
-
 	public void close() {
 	}
 
-	public Tuple next() {
+	public Tuple getNext() {
+		if (_didCreateTable) return null;
+		
 		CoffeeDB db = CoffeeDB.getInstance();
 		Catalog catalog = db.getCatalog();
 		

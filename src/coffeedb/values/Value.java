@@ -2,6 +2,7 @@ package coffeedb.values;
 
 import java.util.ArrayList;
 
+import coffeedb.operators.Predicate;
 import coffeedb.types.Type;
 
 public abstract class Value {
@@ -42,5 +43,9 @@ public abstract class Value {
 		}
 		
 		return toValueArray(values.toArray());
+	}
+	public boolean compare(Predicate _filter, Value _comparison) {
+		assert false : "Not yet implemented";
+		return false;
 	}
 }
