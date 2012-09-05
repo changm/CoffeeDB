@@ -47,7 +47,7 @@ public class IntValue extends Value {
 	public boolean compare(Predicate predicate, IntValue other) {
 		switch (predicate) {
 		case LESS:
-			return other._value < this._value;
+			return this._value < other._value;
 		default:
 			assert (false);
 			break;

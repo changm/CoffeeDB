@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Stack;
 
 import coffeedb.operators.Comparison;
+import coffeedb.operators.FilterOperator;
 import coffeedb.operators.Operator;
 import coffeedb.operators.Predicate;
 import coffeedb.operators.ScanOperator;
@@ -45,7 +46,7 @@ import net.sf.jsqlparser.statement.update.Update;
 
 public class SqlParser implements StatementVisitor {
 	private String _query;
-	private QueryPlan _queryPlan;
+	protected QueryPlan _queryPlan;
 	
 	public SqlParser(String query) {
 		_query = query;
@@ -68,14 +69,10 @@ public class SqlParser implements StatementVisitor {
 	}
 
 	public void visit(Select select) {
-		SelectQueryPlan selectData = new SelectQueryPlan(_queryPlan);
 		SelectBody body = select.getSelectBody();
+		SelectQueryPlan selectData = new SelectQueryPlan();
 		body.accept(selectData);
-		
-		ScanOperator scan = _queryPlan.addSelect(selectData.getTableName(), selectData.getColumns());
-		if (selectData._whereClause != null) {
-			_queryPlan.addWhere(scan, selectData._whereClause);
-		}
+		_queryPlan.addOperator(selectData.getOperator());
 	}
 
 	public void visit(Delete delete) {
@@ -129,6 +126,11 @@ public class SqlParser implements StatementVisitor {
 		
 	/***
 	 * Visitor dedicated to creating query plans for SELECT statements
+	 * Attempting to use recursive descent parser like we do with Java languages
+	 * As you go down the visitor hole, put things on the stack
+	 * As you come out of the visitor hole, pop things off the stack
+	 * The top should be the Query Plan in relational algebra with operators
+	 * already set up.
 	 * @author masonchang
 	 *
 	 */
@@ -137,12 +139,17 @@ public class SqlParser implements StatementVisitor {
 		private ArrayList<String> _columns;
 		private Comparison _whereClause;
 		private QueryPlan _queryPlan;
+		private Operator _topOperator;
 		
-		public SelectQueryPlan(QueryPlan queryPlan) {
+		public SelectQueryPlan() {
 			_columns = new ArrayList<String>();
-			_queryPlan = queryPlan;
 		}
 		
+		public Operator getOperator() {
+			assert (_topOperator != null);
+			return _topOperator;
+		}
+
 		public void visit(AllColumns allColumns) {
 			_columns.add(allColumns.toString());
 		}
@@ -161,12 +168,13 @@ public class SqlParser implements StatementVisitor {
 				item.accept(this);
 			}
 			
-			
 			Expression whereClause = plainSelect.getWhere();
 			if (whereClause != null) {
 				ExpressionPlan where = new ExpressionPlan();
 				whereClause.accept(where);
-				_whereClause = (Comparison) where._result;
+				Comparison result = where.getResult();
+				
+				_topOperator = new FilterOperator(result, _topOperator);
 			}
 		}
 
@@ -176,6 +184,7 @@ public class SqlParser implements StatementVisitor {
 
 		public void visit(Table table) {
 			_tableName = table.getName();
+			_topOperator = new ScanOperator(_tableName);
 		}
 
 		public void visit(SubSelect arg0) {
@@ -203,10 +212,14 @@ public class SqlParser implements StatementVisitor {
 	class ExpressionPlan implements ExpressionVisitor {
 		private Stack<Value> _values;
 		Operator _op;
-		public Object _result;
+		public Comparison _result;
 		
 		public ExpressionPlan() {
 			_values = new Stack<Value>();
+		}
+		
+		public Comparison getResult() {
+			return _result;
 		}
 		
 		public void visit(NullValue arg0) {

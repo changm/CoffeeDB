@@ -20,7 +20,7 @@ public class QueryPlan {
 		return _operators;
 	}
 	
-	private void addOperator(Operator op) {
+	public void addOperator(Operator op) {
 		_operators.add(0, op);
 	}
 
