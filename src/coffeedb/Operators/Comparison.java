@@ -1,6 +1,6 @@
 package coffeedb.operators;
 
-import coffeedb.values.Value;
+import coffeedb.Value;
 
 public class Comparison {
 	public Predicate predicate;

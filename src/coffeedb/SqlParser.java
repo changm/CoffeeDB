@@ -12,7 +12,6 @@ import coffeedb.operators.Operator;
 import coffeedb.operators.Predicate;
 import coffeedb.operators.ScanOperator;
 import coffeedb.types.Type;
-import coffeedb.values.*;
 
 import net.sf.jsqlparser.*;
 import net.sf.jsqlparser.expression.*;
@@ -250,9 +249,10 @@ public class SqlParser implements StatementVisitor {
 		public void visit(LongValue longValue) {
 			long value = longValue.getValue();
 			if (value == (int) value) {
-				_values.push(new IntValue((int)value));
+				_values.push(Value.createInt((int) value));
 			} else {
-				_values.push(new coffeedb.values.LongValue(value));
+				assert (false);
+				_values.push(Value.createInt((int) value));
 			}
 		}
 
@@ -372,7 +372,7 @@ public class SqlParser implements StatementVisitor {
 
 		public void visit(Column column) {
 			String columnName = column.getColumnName();
-			_values.push(new coffeedb.values.StringValue(columnName));
+			_values.push(Value.createString(columnName));
 		}
 
 		@Override
@@ -480,9 +480,9 @@ public class SqlParser implements StatementVisitor {
 		public void visit(LongValue longValue) {
 			long value = longValue.getValue();
 			if (value == (int) value) {
-				_values.add(new IntValue((int) value));
+				_values.add(Value.createInt((int) value)); 
 			} else {
-				_values.add(new coffeedb.values.LongValue(value));
+				_values.add(Value.createInt((int) value));
 			}
 		}
 

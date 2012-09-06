@@ -2,9 +2,6 @@ package coffeedb;
 
 import java.util.ArrayList;
 
-import coffeedb.types.Type;
-import coffeedb.values.Value;
-
 /***
  * Represents one tuple that is stored in the database.
  * A tuple is a collection of Values
@@ -18,22 +15,11 @@ public class Tuple {
 	public Tuple(Schema schema, Object...objects) {
 		_values = Value.createValueArray(objects);
 		_schema = schema;
-		consistencyCheck();
 	}
 	
 	public Tuple(Schema schema, Value[] values) {
 		_values = values;
 		_schema = schema;
-		consistencyCheck();
-	}
-	
-	private void consistencyCheck() {
-		for (int i = 0; i < _values.length; i++) {
-			Value value = _values[i];
-			Type schemaType = _schema._columnTypes.get(i);
-			assert (schemaType.equals(value.getType()));
-		}
-		
 	}
 	
 	public Tuple(Iterable<Value> values) {
@@ -47,14 +33,14 @@ public class Tuple {
 		list.toArray(_values);
 	}
 
-	public void setValue(int field, Value value) {
-		assert (field < _values.length);
-		_values[field] = value;
+	public void setValue(int column, Value value) {
+		assert (column < _values.length);
+		_values[column] = value;
 	}
 	
-	public Value getValue(int field) {
-		assert (field < _values.length);
-		return _values[field];
+	public Value getValue(int column) {
+		assert (column < _values.length);
+		return _values[column];
 	}
 	
 	public String toString() {

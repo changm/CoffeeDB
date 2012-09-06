@@ -1,13 +1,7 @@
 package coffeedb;
 
 import java.util.ArrayList;
-
-import java.util.List;
-
-import net.sf.jsqlparser.statement.select.SelectItem;
-
 import coffeedb.operators.*;
-import coffeedb.values.Value;
 
 public class QueryPlan {
 	public ArrayList<Operator> _operators;

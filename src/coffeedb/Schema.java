@@ -38,4 +38,13 @@ public class Schema {
 		_columnNames.add(columnName);
 		_columnTypes.add(type);
 	}
+	
+	public int getSize() {
+		int size = 0;
+		for (Type type : _columnTypes) {
+			size += type.getSize();
+		}
+		
+		return size;
+	}
 }

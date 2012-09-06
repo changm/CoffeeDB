@@ -2,6 +2,7 @@ package coffeedb.operators;
 
 import java.util.ArrayList;
 
+
 import java.util.Iterator;
 
 import coffeedb.Catalog;
@@ -9,8 +10,8 @@ import coffeedb.CoffeeDB;
 import coffeedb.Schema;
 import coffeedb.Table;
 import coffeedb.Tuple;
+import coffeedb.Value;
 import coffeedb.types.Type;
-import coffeedb.values.*;
 
 public class InsertOperator extends Operator {
 	private String _tableName;
@@ -43,7 +44,7 @@ public class InsertOperator extends Operator {
 	
 	private Tuple createResultTuple(int insertCount) {
 		String resultString = "Inserted " + insertCount + " rows";
-		Value[] results = Value.toValueArray(new StringValue(resultString));
+		Value[] results = Value.createValueArray(resultString); 
 		
 		Schema schema = new Schema();
 		schema.addColumn("result", Type.getStringType());

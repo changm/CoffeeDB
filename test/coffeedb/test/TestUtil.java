@@ -3,8 +3,6 @@ package coffeedb.test;
 import coffeedb.*;
 import coffeedb.operators.ScanOperator;
 import coffeedb.types.*;
-import coffeedb.values.IntValue;
-import coffeedb.values.Value;
 
 public class TestUtil {
 	public static Schema getSimpleSchema() {
@@ -29,9 +27,7 @@ public class TestUtil {
 	}
 
 	public static Tuple createSimpleTuple() {
-		Value intValue = new IntValue(10);
-		Value[] values = Value.toValueArray(intValue);
-		
+		Value[] values = Value.createValueArray(10);
 		Schema schema = new Schema();
 		schema.addColumn("intVal", Type.getIntType());
 		return new Tuple(schema, values);

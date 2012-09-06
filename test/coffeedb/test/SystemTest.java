@@ -36,12 +36,12 @@ public class SystemTest {
 		Catalog catalog = database.getCatalog();
 		
 		String tableName = "test";
-		Table table = catalog.getTable(tableName);
-		
 		assertFalse(catalog.tableExists(tableName));
 		database.runQuery("create table test (a int, b int)");
 		assertTrue(catalog.tableExists(tableName));
 		
+		
+		Table table = catalog.getTable(tableName);
 		Tuple inserted = new Tuple(table.getSchema(), 10, 20);
 		database.runQuery("insert into test values (10, 20);");
 		assertTrue(TestUtil.tupleExists(tableName, inserted));

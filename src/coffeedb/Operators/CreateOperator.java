@@ -1,6 +1,5 @@
 package coffeedb.operators;
 
-import coffeedb.values.*;
 import coffeedb.*;
 import coffeedb.types.Type;
 
@@ -34,7 +33,7 @@ public class CreateOperator extends Operator {
 	}
 
 	private Tuple createSuccessTuple() {
-		Value[] result = Value.toValueArray(new StringValue("Created table " + _tableName));
+		Value[] result = Value.createValueArray("Created table " + _tableName);
 		Schema stringSchema = new Schema();
 		stringSchema.addColumn("Result", Type.getStringType());
 		return new Tuple(stringSchema, result);
