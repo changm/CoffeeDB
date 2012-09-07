@@ -1,21 +1,27 @@
 package coffeedb;
 
 import coffeedb.executionengine.SqlInterpreter;
+import coffeedb.executionengine.TransactionManager;
 
 public class ExecutionEngine {
+	private SqlInterpreter _interpreter;
+	private TransactionManager _transactionManager;
+	
 	public ExecutionEngine() {
+		init();
 	}
 	
-	public void runPlan(QueryPlan plan) {
-		assert (plan != null);
-		SqlInterpreter interpreter = new SqlInterpreter();
-		Tuple[] results = interpreter.runPlan(plan);
-		printResults(results);
+	private void init() {
+		_transactionManager = new TransactionManager();
+		_interpreter = new SqlInterpreter(_transactionManager);
+		_interpreter.start();
 	}
-	
-	public void printResults(Tuple[] results) {
-		for (Tuple tuple : results) {
-			System.out.println(tuple);
-		}
+
+	public Transaction executeQueryPlan(QueryPlan plan) {
+		return _transactionManager.addQueryPlan(plan);
+	}
+
+	public void shutdown() {
+		_interpreter._finish = true;
 	}
 }

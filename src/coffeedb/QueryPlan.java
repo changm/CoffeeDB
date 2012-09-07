@@ -5,6 +5,7 @@ import coffeedb.operators.*;
 
 public class QueryPlan {
 	public ArrayList<Operator> _operators;
+	private Transaction _transaction;
 	
 	public QueryPlan() {
 		_operators = new ArrayList<Operator>();
@@ -39,5 +40,13 @@ public class QueryPlan {
 		FilterOperator filter = new FilterOperator(compare, scan);
 		addOperator(filter);
 		return filter;
+	}
+
+	public Transaction getTransaction() {
+		return _transaction;
+	}
+
+	public void setTransaction(Transaction transaction) {
+		this._transaction = transaction;
 	}
 }
