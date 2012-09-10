@@ -34,6 +34,10 @@ public class Catalog {
 	}
 	
 	public void clean() {
+		for (Table table : _tables.values()) {
+			table.clear();
+		}
+		
 		_tables.clear();
 	}
 	

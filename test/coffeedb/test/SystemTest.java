@@ -48,5 +48,17 @@ public class SystemTest {
 		
 		database.runQuery("select * from test;");
 	}
+	
+	@Test
+	public void clearDatabase() {
+		CoffeeDB database = CoffeeDB.getInstance();
+		Catalog catalog = database.getCatalog();
+		String tableName = "test";
+		database.runQuery("create table test (a int, b int)");
+		assertTrue(catalog.tableExists(tableName));
+		
+		database.reset();
+		assertFalse(catalog.tableExists(tableName));
+	}
 
 }

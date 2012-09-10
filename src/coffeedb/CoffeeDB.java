@@ -18,6 +18,10 @@ public class CoffeeDB {
 	private void shutdown() {
 		_engine.shutdown();
 	}
+	
+	public void reset() {
+		_catalog.clean();
+	}
 
 	public void test() {
 		Catalog catalog = CoffeeDB.getInstance().getCatalog();

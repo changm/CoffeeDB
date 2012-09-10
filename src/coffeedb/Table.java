@@ -38,4 +38,8 @@ public class Table {
 	public synchronized boolean hasTuple(Tuple testTuple) {
 		return _data.contains(testTuple);
 	}
+	
+	public void clear() {
+		_data.clear();
+	}
 }
