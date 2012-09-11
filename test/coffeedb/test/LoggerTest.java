@@ -2,6 +2,7 @@ package coffeedb.test;
 
 import static org.junit.Assert.*;
 
+
 import java.io.File;
 import java.util.ArrayList;
 
@@ -11,10 +12,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import coffeedb.Catalog;
-import coffeedb.CoffeeDB;
-import coffeedb.Logger;
-import coffeedb.Schema;
+import coffeedb.*;
 
 public class LoggerTest {
 
@@ -65,6 +63,29 @@ public class LoggerTest {
 		
 		Schema recoverSchema = catalog.getTable(tableName).getSchema();
 		assertTrue(oldSchema.equals(recoverSchema));
+	}
+	
+	@Test
+	public void testRecoverTuple() {
+		CoffeeDB database = CoffeeDB.getInstance();
+		Catalog catalog = database.getCatalog();
+		String tableName = "test";
+		
+		TestUtil.createSimpleTable(tableName);
+		Table table = catalog.getTable(tableName);
+		Schema schema = table.getSchema();
+		
+		Tuple testTuple = TestUtil.createSimpleTuple(schema);
+		table.insertTuple(testTuple);
+		
+		assertTrue(TestUtil.tupleExists(tableName, testTuple));
+		database.snapshot();
+		database.reset();
+		
+		assertFalse(TestUtil.tupleExists(tableName, testTuple));
+		
+		database.recoverFromLog();
+		assertTrue(TestUtil.tupleExists(tableName, testTuple));
 	}
 
 }

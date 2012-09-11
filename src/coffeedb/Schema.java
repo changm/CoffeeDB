@@ -45,15 +45,6 @@ public class Schema {
 		_columnTypes.add(type);
 	}
 	
-	public int getSize() {
-		int size = 0;
-		for (Type type : _columnTypes) {
-			size += type.getSize();
-		}
-		
-		return size;
-	}
-	
 	private byte[] getInt(int value) {
 		return ByteBuffer.allocate(4).putInt(value).array();
 	}
@@ -113,7 +104,6 @@ public class Schema {
 
 	private boolean equalSchema(Schema other) {
 		if (_columnNames.size() != other._columnNames.size()) return false;
-		if (this.getSize() != other.getSize()) return false;
 		
 		for (int i = 0; i < this._columnNames.size(); i++) {
 			String thisName = _columnNames.get(i);

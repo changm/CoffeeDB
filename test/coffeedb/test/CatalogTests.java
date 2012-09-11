@@ -50,7 +50,7 @@ public class CatalogTests {
 	}
 	
 	@Test
-	public void cannotDeleteTest() {
+	public void cannotDeleteNonCreatedTableTest() {
 		Catalog catalog = CoffeeDB.catalog();
 		
 		String tableName = "test";

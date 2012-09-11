@@ -31,7 +31,8 @@ public class QueryPlan {
 	}
 
 	public void createInsertOperator(String tableName, ArrayList<Value> _values) {
-		Tuple tuple = new Tuple(_values);
+		Table table = CoffeeDB.getInstance().getCatalog().getTable(tableName);
+		Tuple tuple = new Tuple(table.getSchema(), _values);
 		InsertOperator insert = new InsertOperator(tableName, tuple);
 		addOperator(insert);
 	}

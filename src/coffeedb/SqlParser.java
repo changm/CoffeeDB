@@ -106,7 +106,7 @@ public class SqlParser implements StatementVisitor {
 			columnNames[i] = columnName;
 			columnTypes[i] = columnType;
 			
-			System.out.println(columnName + " = " + typeName);
+			//System.out.println(columnName + " = " + typeName);
 		}
 		
 		Schema tableSchema = new Schema(columnNames, columnTypes);

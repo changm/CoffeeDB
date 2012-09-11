@@ -26,11 +26,13 @@ public class Value {
 	}
 	
 	public void setInt(int value) {
+		assert (_type.isInt());
 		_buffer.putInt(value);
 		_data = _buffer.array();
 	}
 	
 	public void setString(String value) {
+		assert (_type.isString());
 		_data = value.getBytes();
 	}
 	
@@ -129,5 +131,9 @@ public class Value {
 		assert (_type.isInt());
 		ByteBuffer wrapper = ByteBuffer.wrap(_data);
 		return wrapper.getInt();
+	}
+
+	public byte[] getData() {
+		return _data;
 	}
 }

@@ -33,7 +33,38 @@ public class TestUtil {
 		return new Tuple(schema, values);
 	}
 	
+	public static Tuple createSimpleTuple(Schema schema) {
+		Tuple testTuple = new Tuple(schema);
+		for (int i = 0; i < schema.numberOfColumns(); i++) {
+			Type schemaType = schema._columnTypes.get(i);
+			testTuple.setValue(i, createRandomValue(schemaType));
+		}
+		
+		return testTuple;
+	}
+	
+	private static Value createRandomValue(Type schemaType) {
+		Value value = new Value(schemaType);
+		switch (schemaType.getEnum()) {
+		case INTEGER: {
+			value.setInt(20);
+			break;
+		}
+		default:
+			assert (false);
+			break;
+		}
+		
+		return value;
+	}
+	
+	public static boolean tableExists(String tableName) {
+		return CoffeeDB.getInstance().getCatalog().tableExists(tableName);
+	}
+
 	public static boolean tupleExists(String tableName, Tuple tuple) {
+		if (!tableExists(tableName)) return false;
+		
 		ScanOperator scan = new ScanOperator(tableName);
 		scan.open();
 		while (scan.hasNext()) {

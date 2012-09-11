@@ -139,6 +139,15 @@ public class Logger {
 		return tableNames;
 	}
 
+	/****
+	 * Table is a table header
+	 * then [number of tuples]
+	 * int - tuple size
+	 * tuple data
+	 * footer
+	 * @param table
+	 * @param tableFile
+	 */
 	private void snapshotTable(Table table, String tableFile) {
 		try {
 			FileOutputStream writer = new FileOutputStream(tableFile);
@@ -148,6 +157,8 @@ public class Logger {
 			while (tupleIter.hasNext()) {
 				Tuple tuple = tupleIter.next();
 				byte[] tupleData = tuple.serialize();
+				int tupleLength = tupleData.length;
+				writeInt(tupleLength, writer);
 				writer.write(tupleData);
 			}
 			
@@ -161,7 +172,7 @@ public class Logger {
 	}
 	
 	private Tuple readTuple(FileInputStream tableReader, Schema schema) throws IOException {
-		int tupleSize = schema.getSize();
+		int tupleSize = readInt(tableReader);
 		Tuple tuple = new Tuple(schema);
 		byte[] buffer = new byte[tupleSize];
 		tableReader.read(buffer, 0, tupleSize);
