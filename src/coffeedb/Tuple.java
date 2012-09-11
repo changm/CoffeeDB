@@ -72,4 +72,9 @@ public class Tuple {
 		assert false : "Unknown column";
 		return -1;
 	}
+
+	public byte[] serialize() {
+		assert false : "Not yet implemented";
+		return new byte[10];
+	}
 }

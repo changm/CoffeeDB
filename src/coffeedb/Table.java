@@ -1,20 +1,21 @@
 package coffeedb;
 
-import java.util.ArrayList;
+import java.io.Serializable;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 
-public class Table {
+public class Table implements Serializable {
 	private String _tableName;
 	private Schema _schema;
 	
 	// Really is this it?
 	// Might get a lot harder once we have transactions
-	private ArrayList<Tuple> _data;
+	private LinkedHashSet<Tuple> _data;
 	
 	public Table(String tableName, Schema schema) {
 		_tableName = tableName;
 		_schema = schema;
-		_data = new ArrayList<Tuple>();
+		_data = new LinkedHashSet<Tuple>();
 	}
 	
 	public String getTableName() {
@@ -30,8 +31,6 @@ public class Table {
 	}
 
 	public Iterator<Tuple> getIterator() {
-		// TODO: Ensure consistency, e.g. makes a copy or is actual 
-		// reference. Or somehow make read only
 		return _data.iterator();
 	}
 
@@ -41,5 +40,9 @@ public class Table {
 	
 	public void clear() {
 		_data.clear();
+	}
+	
+	public int getTupleCount() {
+		return _data.size();
 	}
 }

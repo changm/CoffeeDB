@@ -50,4 +50,22 @@ public abstract class Type {
 	
 	// To make it easier to switch
 	public abstract TypeEnum getEnum();
+	
+	public static Type getType(int ordinal) {
+		TypeEnum enumType = TypeEnum.values()[ordinal];
+		switch (enumType) { 
+		case INTEGER: return getIntType();
+		case LONG: return getLongType();
+		case STRING: return getStringType();
+		case BLOB: {
+			assert (false);
+			return null;
+		}
+		default:
+			break;
+		}
+		
+		assert (false);
+		return getIntType();
+	}
 }

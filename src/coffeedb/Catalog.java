@@ -1,6 +1,9 @@
 package coffeedb;
 
 import java.util.HashMap;
+import java.util.Iterator;
+
+import sun.tools.javap.Tables;
 
 /***
  * Contains information about all the tables in the database
@@ -44,5 +47,9 @@ public class Catalog {
 	public boolean deleteTable(String tableName) {
 		Object delete = _tables.remove(tableName);
 		return delete != null;
+	}
+	
+	public Iterator<Table> getTables() {
+		return _tables.values().iterator();
 	}
 }

@@ -5,14 +5,16 @@ public class CoffeeDB {
 	private Config _config = null;
 	private Catalog _catalog;
 	private ExecutionEngine _engine;
+	private Logger _logger;
 	
 	private CoffeeDB() {
-		_catalog = new Catalog();
 		init();
 	}
 	
 	private void init() {
 		_engine = new ExecutionEngine();
+		_catalog = new Catalog();
+		_logger = new Logger();
 	}
 	
 	private void shutdown() {
@@ -34,6 +36,15 @@ public class CoffeeDB {
 		for (Tuple tuple : transaction.getResult()) {
 			System.out.println(tuple);
 		}
+	}
+	
+	private void snapshot() {
+		Logger logger = new Logger();
+		logger.snapshot(this);
+	}
+	
+	private void recoverFromLog(String logfile) {
+		
 	}
 	
 	public void runQuery(String query) {
@@ -65,6 +76,10 @@ public class CoffeeDB {
 		return getInstance().getCatalog();
 	}
 	
+	public static Logger logger() {
+		return getInstance().getLogger();
+	}
+	
 	public static CoffeeDB getInstance() {
 		if (_singleton == null) {
 			_singleton = new CoffeeDB();
@@ -75,6 +90,10 @@ public class CoffeeDB {
 	
 	public Catalog getCatalog() {
 		return _catalog;
+	}
+	
+	public Logger getLogger() {
+		return _logger;
 	}
 	
 	public void setConfig(Config config) {
@@ -100,12 +119,17 @@ public class CoffeeDB {
 		database.setConfig(config);
 		//database.test();
 		database.runQuery("create table test (a int, b int)");
+		database.snapshot();
+		database.shutdown();
+		
+		/*
 		database.runQuery("insert into test values (10, 20);");
 		database.runQuery("select * from test;");
 		
 		System.out.println("Running where");
 		database.runQuery("select * from test where test.a < 15");
 		database.shutdown();
+		*/
 	}
 
 	}
