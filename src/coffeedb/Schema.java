@@ -34,12 +34,6 @@ public class Schema {
 		}
 	}
 	
-	// to reserialize
-	public Schema(byte[] data) {
-		init();
-		recoverFromData(data);
-	}
-	
 	private void init() {
 		_columnNames = new ArrayList<String>();
 		_columnTypes = new ArrayList<Type>();
@@ -59,33 +53,42 @@ public class Schema {
 		
 		return size;
 	}
+	
+	private byte[] getInt(int value) {
+		return ByteBuffer.allocate(4).putInt(value).array();
+	}
 
 	public byte[] serialize() throws IOException {
 		assert (_columnNames.size() == _columnTypes.size());
 		ByteArrayOutputStream buffer = new ByteArrayOutputStream();
-		buffer.write(_columnNames.size());
+		buffer.write(getInt(_columnNames.size()));
 		
 		for (String column : _columnNames) {
-			buffer.write(column.length());
+			buffer.write(getInt(column.length()));
 			buffer.write(column.getBytes());
 		}
 		
 		for (Type type : _columnTypes) {
-			buffer.write(type.getEnum().ordinal());
+			buffer.write(getInt(type.getEnum().ordinal()));
 		}
 		
 		return buffer.toByteArray();
 	}
 	
-	private void recoverFromData(byte[] data) {
+	public void recover(byte[] data) {
 		ByteBuffer buffer = ByteBuffer.wrap(data);
 		int columnCount = buffer.getInt();
-		byte[] column = new byte[255];
-		
+				
 		for (int i = 0; i < columnCount; i++) {
 			int columnNameLength = buffer.getInt();
+			// Have to allocate a new byte buffer 
+			// Otherwise creating a new string from a byte buffer
+			// Includes the empty space
+			byte[] column = new byte[columnNameLength];
 			assert (columnNameLength < 255);
-			String columnName = new String(buffer.get(column, 0, columnNameLength).array());
+			
+			buffer.get(column, 0, columnNameLength);
+			String columnName = new String(column);
 			_columnNames.add(columnName);
 		}
 		
@@ -94,5 +97,34 @@ public class Schema {
 			_columnTypes.add(Type.getType(ordinal));
 		}
 	}
+	
+	public int numberOfColumns() {
+		assert (_columnNames.size() == _columnTypes.size());
+		return _columnNames.size();
+	}
+	
+	public boolean equals(Object object) {
+		if (object instanceof Schema) {
+			return equalSchema((Schema) object);
+		}
+		
+		return false;
+	}
 
+	private boolean equalSchema(Schema other) {
+		if (_columnNames.size() != other._columnNames.size()) return false;
+		if (this.getSize() != other.getSize()) return false;
+		
+		for (int i = 0; i < this._columnNames.size(); i++) {
+			String thisName = _columnNames.get(i);
+			String otherName = other._columnNames.get(i);
+			if (!thisName.equals(otherName)) return false;
+			
+			Type thisType = _columnTypes.get(i);
+			Type otherType = other._columnTypes.get(i);
+			if (!thisType.equals(otherType)) return false;
+		}
+		
+		return true;
+	}
 }

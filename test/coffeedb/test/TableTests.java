@@ -24,4 +24,9 @@ public class TableTests {
 	public void tearDown() throws Exception {
 	}
 	
+	@Test
+	public void schemaEquals() {
+		
+	}
+	
 }

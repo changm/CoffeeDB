@@ -52,4 +52,8 @@ public class Catalog {
 	public Iterator<Table> getTables() {
 		return _tables.values().iterator();
 	}
+	
+	public int getTableCount() {
+		return _tables.size();
+	}
 }

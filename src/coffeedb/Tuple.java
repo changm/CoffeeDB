@@ -12,6 +12,11 @@ public class Tuple {
 	private Value[] _values;
 	private Schema _schema;
 	
+	public Tuple(Schema schema) {
+		_schema = schema;
+		_values = new Value[_schema.numberOfColumns()];
+	}
+	
 	public Tuple(Schema schema, Object...objects) {
 		_values = Value.createValueArray(objects);
 		_schema = schema;
@@ -76,5 +81,9 @@ public class Tuple {
 	public byte[] serialize() {
 		assert false : "Not yet implemented";
 		return new byte[10];
+	}
+
+	public void recover(byte[] buffer) {
+		assert false : "Not yet implemented";
 	}
 }

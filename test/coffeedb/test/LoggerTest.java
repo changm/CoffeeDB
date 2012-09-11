@@ -14,6 +14,7 @@ import org.junit.Test;
 import coffeedb.Catalog;
 import coffeedb.CoffeeDB;
 import coffeedb.Logger;
+import coffeedb.Schema;
 
 public class LoggerTest {
 
@@ -32,14 +33,11 @@ public class LoggerTest {
 	@After
 	public void tearDown() throws Exception {
 	}
-
+	
 	@Test
 	public void testSnapshotFileExists() {
 		CoffeeDB database = CoffeeDB.getInstance();
-		Catalog catalog = database.getCatalog();
-		String tableName = "test";
-		database.runQuery("create table test (a int, b int)");
-		assertTrue(catalog.tableExists(tableName));
+		TestUtil.createSimpleTable("test"); 
 		
 		Logger logger = database.getLogger();
 		ArrayList<String> logFiles = logger.snapshot(database);
@@ -48,6 +46,25 @@ public class LoggerTest {
 			File file = new File(logFile);
 			assertTrue(file.exists());
 		}
+	}
+	
+	@Test
+	public void testRecoverSchema() {
+		CoffeeDB database = CoffeeDB.getInstance();
+		Catalog catalog = database.getCatalog();
+		String tableName = "test";
+		TestUtil.createSimpleTable(tableName);
+		
+		Schema oldSchema = catalog.getTable(tableName).getSchema();
+		
+		database.snapshot();
+		database.reset();
+		assertFalse(catalog.tableExists(tableName));
+		
+		database.recoverFromLog();
+		
+		Schema recoverSchema = catalog.getTable(tableName).getSchema();
+		assertTrue(oldSchema.equals(recoverSchema));
 	}
 
 }

@@ -10,7 +10,7 @@ public class TestUtil {
 		names[0] = "test";
 		
 		Type[] types = new Type[1];
-		types[0] = new IntType();
+		types[0] = Type.getIntType();
 		
 		return new Schema(names, types);
 	}

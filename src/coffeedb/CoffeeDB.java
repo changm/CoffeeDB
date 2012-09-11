@@ -38,13 +38,12 @@ public class CoffeeDB {
 		}
 	}
 	
-	private void snapshot() {
-		Logger logger = new Logger();
-		logger.snapshot(this);
+	public void snapshot() {
+		getLogger().snapshot(this);
 	}
 	
-	private void recoverFromLog(String logfile) {
-		
+	public void recoverFromLog() {
+		getLogger().recoverFromSnapshot(this);
 	}
 	
 	public void runQuery(String query) {
@@ -120,6 +119,16 @@ public class CoffeeDB {
 		//database.test();
 		database.runQuery("create table test (a int, b int)");
 		database.snapshot();
+		
+		Catalog catalog = database.getCatalog();
+		Schema testSchema = catalog.getTable("test").getSchema();
+		
+		database.reset();
+		database.recoverFromLog();
+		
+		Schema recoverSchema = catalog.getTable("test").getSchema();
+		assert (testSchema.equals(recoverSchema));
+		
 		database.shutdown();
 		
 		/*
