@@ -45,10 +45,7 @@ public class InsertOperator extends Operator {
 	private Tuple createResultTuple(int insertCount) {
 		String resultString = "Inserted " + insertCount + " rows";
 		Value[] results = Value.createValueArray(resultString); 
-		
-		Schema schema = new Schema();
-		schema.addColumn("result", Type.getStringType());
-		return new Tuple(schema, results);
+		return new Tuple(getSchema(), results);
 	}
 
 	public Tuple getNext() {
@@ -70,5 +67,11 @@ public class InsertOperator extends Operator {
 	
 	public void reset() {
 		
+	}
+	
+	protected Schema getSchema() {
+		Schema schema = new Schema();
+		schema.addColumn("result", Type.getStringType());
+		return schema;
 	}
 }

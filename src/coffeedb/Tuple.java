@@ -43,6 +43,10 @@ public class Tuple {
 	public Tuple(Iterable<Value> values) {
 		setValues(values);
 	}
+	
+	public Schema getSchema() {
+		return _schema;
+	}
 
 	private void setValues(Iterable<Value> values) {
 		ArrayList<Value> list = new ArrayList<Value>();
@@ -63,6 +67,11 @@ public class Tuple {
 	public Value getValue(int column) {
 		assert (column < _values.length);
 		return _values[column];
+	}
+	
+	public Value getValue(String columnName) {
+		int index = getIndex(columnName);
+		return getValue(index);
 	}
 	
 	public String toString() {

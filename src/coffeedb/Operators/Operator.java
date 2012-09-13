@@ -1,5 +1,6 @@
 package coffeedb.operators;
 
+import coffeedb.Schema;
 import coffeedb.Tuple;
 
 public abstract class Operator {
@@ -27,4 +28,5 @@ public abstract class Operator {
 	public abstract void reset();
 	public abstract void close();
 	protected abstract Tuple getNext();
+	protected abstract Schema getSchema();
 }

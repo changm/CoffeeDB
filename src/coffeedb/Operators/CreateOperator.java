@@ -34,11 +34,15 @@ public class CreateOperator extends Operator {
 
 	private Tuple createSuccessTuple() {
 		Value[] result = Value.createValueArray("Created table " + _tableName);
-		Schema stringSchema = new Schema();
-		stringSchema.addColumn("Result", Type.getStringType());
-		return new Tuple(stringSchema, result);
+		return new Tuple(getSchema(), result);
 	}
 
 	public void reset() {
+	}
+
+	protected Schema getSchema() {
+		Schema stringSchema = new Schema();
+		stringSchema.addColumn("Result", Type.getStringType());
+		return stringSchema;
 	}
 }

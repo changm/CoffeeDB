@@ -120,8 +120,10 @@ public class CoffeeDB {
 		database.runQuery("create table test (a int, b int)");
 		database.runQuery("insert into test values (10, 20);");
 		database.runQuery("select * from test;");
+		database.runQuery("select count(a) from test");
 		database.snapshot();
 		
+		/*
 		Catalog catalog = database.getCatalog();
 		Schema testSchema = catalog.getTable("test").getSchema();
 		
@@ -132,6 +134,7 @@ public class CoffeeDB {
 		assert (testSchema.equals(recoverSchema));
 		
 		database.runQuery("select * from test;");
+		*/
 		database.shutdown();
 		
 		/*

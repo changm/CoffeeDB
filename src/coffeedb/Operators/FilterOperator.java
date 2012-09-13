@@ -1,5 +1,6 @@
 package coffeedb.operators;
 
+import coffeedb.Schema;
 import coffeedb.Tuple;
 import coffeedb.Value;
 
@@ -42,6 +43,10 @@ public class FilterOperator extends Operator {
 
 	public void reset() {
 		assert false : "Not yet implemented";
+	}
+
+	protected Schema getSchema() {
+		return _operator.getSchema();
 	}
 
 }

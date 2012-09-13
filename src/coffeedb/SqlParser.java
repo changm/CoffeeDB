@@ -157,7 +157,7 @@ public class SqlParser implements StatementVisitor {
 			assert (false);
 		}
 
-		public void visit(SelectExpressionItem arg0) {
+		public void visit(SelectExpressionItem selectExpression) {
 			assert (false);
 		}
 
