@@ -6,5 +6,5 @@ package coffeedb.types;
  *
  */
 public enum TypeEnum {
-	INTEGER, LONG, STRING, BLOB
+	INTEGER, LONG, STRING, BLOB, FUNCTION
 }

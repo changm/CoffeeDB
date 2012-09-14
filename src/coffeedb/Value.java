@@ -115,6 +115,8 @@ public class Value {
 			return Integer.toString(toInt());
 		case STRING:
 			return dataToString();
+		case FUNCTION:
+			return ((Function) this)._functionName;
 		default:
 			assert (false);
 			break;

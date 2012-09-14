@@ -14,11 +14,13 @@ public class ExecutionEngine {
 	private void init() {
 		_transactionManager = new TransactionManager();
 		_interpreter = new SqlInterpreter(_transactionManager);
-		_interpreter.start();
+		//_interpreter.start();
 	}
 
 	public Transaction executeQueryPlan(QueryPlan plan) {
-		return _transactionManager.addQueryPlan(plan);
+		Transaction transaction = _transactionManager.addQueryPlan(plan);
+		_interpreter.run();
+		return transaction;
 	}
 
 	public void shutdown() {

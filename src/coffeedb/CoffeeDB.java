@@ -51,6 +51,9 @@ public class CoffeeDB {
 		QueryPlan plan = parser.generateQueryPlan();
 		
 		Transaction transaction = _engine.executeQueryPlan(plan);
+		assert (transaction.didCommit());
+		printResults(transaction);
+		/*
 		while (!transaction.didCommit()) {
 			try {
 				Thread.sleep(50);

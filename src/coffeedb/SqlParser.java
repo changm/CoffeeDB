@@ -2,6 +2,7 @@ package coffeedb;
 
 import java.io.StringReader;
 
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
@@ -139,6 +140,7 @@ public class SqlParser implements StatementVisitor {
 		private Comparison _whereClause;
 		private QueryPlan _queryPlan;
 		private Operator _topOperator;
+		private Function _selectFunction;
 		
 		public SelectQueryPlan() {
 			_columns = new ArrayList<String>();
@@ -158,22 +160,30 @@ public class SqlParser implements StatementVisitor {
 		}
 
 		public void visit(SelectExpressionItem selectExpression) {
-			assert (false);
+			ExpressionPlan expression = new ExpressionPlan();
+			selectExpression.getExpression().accept(expression);
+			System.out.println("Expression result: " + expression.getFunction());
+			
+			_selectFunction = expression.getFunction();
+			assert (_topOperator != null);
+			assert (_selectFunction != null);
+			
+			_topOperator = new FilterOperator(_selectFunction, _topOperator);
 		}
 
 		public void visit(PlainSelect plainSelect) {
 			plainSelect.getFromItem().accept(this);
-			for (SelectItem item : plainSelect.getSelectItems()) {
-				item.accept(this);
-			}
 			
 			Expression whereClause = plainSelect.getWhere();
 			if (whereClause != null) {
 				ExpressionPlan where = new ExpressionPlan();
 				whereClause.accept(where);
-				Comparison result = where.getResult();
-				
+				Function result = where.getResult();
 				_topOperator = new FilterOperator(result, _topOperator);
+			}
+			
+			for (SelectItem item : plainSelect.getSelectItems()) {
+				item.accept(this);
 			}
 		}
 
@@ -202,6 +212,10 @@ public class SqlParser implements StatementVisitor {
 			return _columns;
 		}
 		
+		public Function getFunction() {
+			return _selectFunction;
+		}
+		
 		public Comparison getWhere() {
 			return _whereClause;
 		}
@@ -211,13 +225,17 @@ public class SqlParser implements StatementVisitor {
 	class ExpressionPlan implements ExpressionVisitor {
 		private Stack<Value> _values;
 		Operator _op;
-		public Comparison _result;
+		private Function _result;
+		
+		public Function getFunction() {
+			return _result;
+		}
 		
 		public ExpressionPlan() {
 			_values = new Stack<Value>();
 		}
 		
-		public Comparison getResult() {
+		public Function getResult() {
 			return _result;
 		}
 		
@@ -225,9 +243,18 @@ public class SqlParser implements StatementVisitor {
 			assert false : "Not yet implemented";
 		}
 
-		@Override
-		public void visit(Function arg0) {
-			assert false : "Not yet implemented";
+		public void visit(net.sf.jsqlparser.expression.Function function) {
+			String functionName = function.getName();
+			
+			ExpressionList params = function.getParameters();
+			for (Expression expression : params.getExpressions()) {
+				expression.accept(this);
+			}
+			
+			ArrayList<Value> parameters = new ArrayList<Value>();
+			while (!_values.isEmpty()) { parameters.add(_values.pop()); }
+			
+			_result = new Function(functionName, parameters);
 		}
 
 		@Override
@@ -429,7 +456,7 @@ public class SqlParser implements StatementVisitor {
 		public void visit(BitwiseXor arg0) {
 			assert false : "Not yet implemented";
 		}
-		
+
 	}
 	
 	/***
@@ -461,7 +488,7 @@ public class SqlParser implements StatementVisitor {
 			assert (false);
 		}
 
-		public void visit(Function function) {
+		public void visit(net.sf.jsqlparser.expression.Function function) {
 			assert (false);
 		}
 
