@@ -1,5 +1,7 @@
 package coffeedb;
 
+import coffeedb.parser.Parser;
+
 public class CoffeeDB {
 	static CoffeeDB _singleton = null;
 	private Config _config = null;
@@ -47,8 +49,8 @@ public class CoffeeDB {
 	}
 	
 	public void runQuery(String query) {
-		SqlParser parser = new SqlParser(query);
-		QueryPlan plan = parser.generateQueryPlan();
+		Parser parser = new Parser();
+		QueryPlan plan = parser.parseQuery(query);
 		
 		Transaction transaction = _engine.executeQueryPlan(plan);
 		assert (transaction.didCommit());
