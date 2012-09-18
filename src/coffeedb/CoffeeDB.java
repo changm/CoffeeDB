@@ -35,8 +35,13 @@ public class CoffeeDB {
 	
 	private void printResults(Transaction transaction) {
 		assert (transaction.didCommit());
-		for (Tuple tuple : transaction.getResult()) {
+		Tuple[] results = transaction.getResult();
+		for (Tuple tuple : results) {
 			System.out.println(tuple);
+		}
+		
+		if (results.length == 0) {
+			System.out.println("No rows selected");
 		}
 	}
 	
@@ -121,12 +126,17 @@ public class CoffeeDB {
 		Config config = parseConfig(args);
 		CoffeeDB database = CoffeeDB.getInstance();
 		database.setConfig(config);
+		
+		database.runQuery("create table test (a int, b int);");
+		database.runQuery("select * from test;");
 		//database.test();
+		/*
 		database.runQuery("create table test (a int, b int)");
 		database.runQuery("insert into test values (10, 20);");
 		database.runQuery("select * from test;");
 		database.runQuery("select count(a) from test");
 		database.snapshot();
+		*/
 		
 		/*
 		Catalog catalog = database.getCatalog();

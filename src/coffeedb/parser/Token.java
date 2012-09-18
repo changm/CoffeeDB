@@ -5,6 +5,7 @@ package coffeedb.parser;
  * @author masonchang
  */
 public enum Token {
+	// Keywords
 	SELECT, 
 	INSERT,
 	UPDATE,
@@ -12,10 +13,21 @@ public enum Token {
 	WHERE,
 	GROUP,
 	BY,
+	CREATE,
+	
+	// Symbols
 	LEFT_PAREN,
 	RIGHT_PAREN,
 	IDENT,
 	ASTERIK, 
 	COMMA, 
 	SEMI_COLON,
+	
+	// Types
+	INT,
+	STRING,
+	VARCHAR,
+	BLOB, 
+	LONG, 
+	EOF,
 };

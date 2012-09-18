@@ -3,7 +3,9 @@ package coffeedb.parser;
 import java.util.ArrayList;
 
 import coffeedb.QueryPlan;
-import coffeedb.operators.Operator;
+import coffeedb.Schema;
+import coffeedb.operators.*;
+import coffeedb.types.Type;
 
 public class Parser {
 	private String _query;
@@ -19,12 +21,15 @@ public class Parser {
 		
 		Operator operator = null;
 		
-		switch (_scanner.next()) {
+		switch (getNext()) {
 		case INSERT:
 			operator = parseInsert();
 			break;
 		case SELECT:
 			operator = parseSelect();
+			break;
+		case CREATE:
+			operator = parseCreate();
 			break;
 		case UPDATE:
 			default:
@@ -32,15 +37,71 @@ public class Parser {
 		}
 		
 		assert (operator != null);
-		return new QueryPlan();
+		eat (Token.SEMI_COLON);
+		
+		QueryPlan plan = new QueryPlan();
+		plan.addOperator(operator);
+		return plan;
+	}
+
+	private Operator parseCreate() {
+		eat(Token.CREATE);
+		assert (getIdent().equalsIgnoreCase("table"));
+		eat(Token.IDENT);
+		
+		String tableName = getIdent();
+		eat(Token.IDENT);
+		eat(Token.LEFT_PAREN);
+		Schema schema = parseParams();
+		eat (Token.RIGHT_PAREN);
+		
+		return new CreateOperator(tableName, schema);
+	}
+
+	private Schema parseParams() {
+		Schema schema = new Schema();
+		
+		String columnName = getIdent();
+		eat(Token.IDENT);
+		
+		Token typeToken = peek();
+		Type columnType = Type.getType(typeToken);
+		eat (typeToken);
+		
+		schema.addColumn(columnName, columnType);
+		
+		while (isToken(Token.COMMA)) {
+			eat(Token.COMMA);
+			columnName = getIdent();
+			eat (Token.IDENT);
+			
+			typeToken = peek();
+			columnType = Type.getType(typeToken);
+			eat(typeToken);
+			
+			schema.addColumn(columnName, columnType);
+		}
+		
+		return schema;
+	}
+
+	private Token getNext() {
+		_current = _scanner.next();
+		return _current;
 	}
 
 	private Operator parseSelect() {
 		eat(Token.SELECT);
-		String[] columns = parseColumns();
+		
+		boolean allColumns = isToken(Token.ASTERIK);
+		if (!allColumns) {
+			String[] columns = parseStrings();
+		} else {
+			eat(Token.ASTERIK);
+		}
 		
 		eat(Token.FROM);
-		parseTables();
+		String[] tables = parseStrings();
 		
 		if (isToken(Token.WHERE)) {
 			parseWhere();
@@ -53,12 +114,8 @@ public class Parser {
 			
 		}
 		
-		assert (false);
-		return null;
-	}
-
-	private void parseTables() {
-		assert false : "Not yet implemented";
+		assert (tables.length == 1);
+		return new ScanOperator(tables[0]);
 	}
 
 	private void parseGroupBy() {
@@ -69,18 +126,20 @@ public class Parser {
 		assert false : "Not yet implemented";
 	}
 
-	private String[] parseColumns() {
-		ArrayList<String> columns = new ArrayList<String>();
+	// Parse String, Deliminated, By, Comma
+	private String[] parseStrings() {
+		ArrayList<String> strings = new ArrayList<String>();
 		String ident = getIdent();
-		columns.add(ident);
+		strings.add(ident);
+		eat(Token.IDENT);
 		
 		while (isToken(Token.COMMA)) {
 			eat(Token.COMMA);
 			ident = getIdent();
-			columns.add(ident);
+			strings.add(ident);
 		}
 		
-		return (String[]) columns.toArray();
+		return strings.toArray(new String[strings.size()]);
 	}
 	
 	private String getIdent() {
@@ -93,7 +152,7 @@ public class Parser {
 	}
 	
 	private void eat(Token token) {
-		assert (_current == token);
+		assert (_current == token) : "Wrong token. Expected " + token.name() + " got: " + _current.name();
 		_current = _scanner.next();
 	}
 	

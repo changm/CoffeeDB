@@ -1,5 +1,7 @@
 package coffeedb.types;
 
+import coffeedb.parser.Token;
+
 public abstract class Type {
 	public boolean isInt() { return false; }
 	public boolean isBlob() { return false; }
@@ -70,5 +72,16 @@ public abstract class Type {
 		
 		assert (false);
 		return getIntType();
+	}
+	
+	public static Type getType(Token token) {
+		switch (token) {
+		case INT: return getIntType();
+		case STRING: return getStringType();
+		case LONG: return getLongType();
+		default: assert (false);
+		}
+		
+		return null;
 	}
 }

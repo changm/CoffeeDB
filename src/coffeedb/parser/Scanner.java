@@ -17,8 +17,10 @@ public class Scanner {
 	}
 	
 	private void initTokenNames() {
+		_tokenNames = new HashMap<String, Token>();
+		
 		for (Token t : Token.values()) {
-			_tokenNames.put(t.name(), t);
+			_tokenNames.put(t.name().toLowerCase(), t);
 		}
 		
 		initTokenSymbols();
@@ -33,20 +35,36 @@ public class Scanner {
 	}
 
 	private boolean isEOF() {
-		return _currentLoc == _queryString.length;
+		return _currentLoc == _queryString.length; 
 	}
 	
 	public Token next() {
+		if (isEOF()) return Token.EOF;
+		
 		char current = _queryString[_currentLoc];
 		StringBuffer nextToken = new StringBuffer();
+		current = eatWhitespace(current);
 		
-		while ((current != ' ') || isEOF()) {
+		if (!Character.isLetterOrDigit(current)) {
 			nextToken.append(current);
-			current = _queryString[++_currentLoc];
+			++_currentLoc;
+		} else {
+			// Ident parsing
+			while (!(Character.isWhitespace(current)) && !isEOF() && Character.isLetterOrDigit(current)) {
+				nextToken.append(current);
+				current = _queryString[++_currentLoc];
+			}
 		}
 		
 		String result = nextToken.toString();
 		return getToken(result);
+	}
+
+	private char eatWhitespace(char current) {
+		while (Character.isWhitespace(current)) {
+			current = _queryString[++_currentLoc];
+		}
+		return current;
 	}
 
 	private Token getToken(String result) {
