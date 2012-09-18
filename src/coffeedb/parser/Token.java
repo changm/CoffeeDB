@@ -14,6 +14,8 @@ public enum Token {
 	GROUP,
 	BY,
 	CREATE,
+	INTO,
+	VALUES,
 	
 	// Symbols
 	LEFT_PAREN,
@@ -29,5 +31,5 @@ public enum Token {
 	VARCHAR,
 	BLOB, 
 	LONG, 
-	EOF,
+	EOF
 };

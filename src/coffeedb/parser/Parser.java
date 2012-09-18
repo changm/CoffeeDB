@@ -2,8 +2,11 @@ package coffeedb.parser;
 
 import java.util.ArrayList;
 
+import coffeedb.CoffeeDB;
 import coffeedb.QueryPlan;
 import coffeedb.Schema;
+import coffeedb.Tuple;
+import coffeedb.Value;
 import coffeedb.operators.*;
 import coffeedb.types.Type;
 
@@ -161,7 +164,46 @@ public class Parser {
 	}
 
 	private Operator parseInsert() {
-		assert false : "Not yet implemented";
-		return null;
+		eat(Token.INSERT);
+		eat(Token.INTO);
+		String tableName = getIdent();
+		eat(Token.IDENT);
+		eat(Token.VALUES);
+		eat(Token.LEFT_PAREN);
+		
+		String[] values = parseValues();
+		
+		eat(Token.RIGHT_PAREN);
+		Tuple tuple = convertIntoTuple(tableName, values);
+		return new InsertOperator(tableName, tuple);
+	}
+
+	private Tuple convertIntoTuple(String tableName, String[] stringValues) {
+		Schema tableSchema = CoffeeDB.catalog().getTable(tableName).getSchema();
+		Value[] values = new Value[stringValues.length];
+		
+		for (int i = 0; i < values.length; i++) {
+			Type type = tableSchema._columnTypes.get(i);
+			String string = stringValues[i];
+			Value value = new Value(type, string);
+			values[i] = value;
+		}
+		
+		return new Tuple(tableSchema, values);
+	}
+
+	private String[] parseValues() {
+		ArrayList<String> strings =  new ArrayList<String>();
+		String value = getIdent();
+		strings.add(value);
+		eat(Token.IDENT);
+		
+		while (isToken(Token.COMMA)) {
+			eat(Token.COMMA);
+			value = getIdent();
+			eat(Token.IDENT);
+		}
+		
+		return strings.toArray(new String[strings.size()]);
 	}
 }

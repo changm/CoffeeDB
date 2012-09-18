@@ -25,6 +25,35 @@ public class Value {
 		return _type;
 	}
 	
+	public Value(Type type, String value) {
+		_type = type;
+		_buffer = ByteBuffer.allocate(_type.getSize());
+		toType(value);
+	}
+	
+	private void toType(String value) {
+		switch (_type.getEnum()) {
+		case BLOB:
+			assert (false);
+			break;
+		case FUNCTION:
+			assert (false);
+			break;
+		case INTEGER:
+			setInt(Integer.parseInt(value));
+			break;
+		case LONG:
+			assert (false);
+			break;
+		case STRING:
+			setString(value);
+			break;
+		default:
+			assert (false);
+			break;
+		}
+	}
+
 	public void setInt(int value) {
 		assert (_type.isInt());
 		_buffer.putInt(value);

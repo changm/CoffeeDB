@@ -1,6 +1,7 @@
 package coffeedb.operators;
 
 import java.util.ArrayList;
+import java.util.List;
 
 
 import java.util.Iterator;
@@ -27,8 +28,8 @@ public class InsertOperator extends Operator {
 		for (Object o : objects) {
 			((ArrayList<Tuple>) _tuples).add((Tuple) o);
 		}
-		
 	}
+	
 	public InsertOperator(String tableName, Iterable<Tuple> tuples) {
 		_tableName = tableName;
 		assert (tuples != null);
