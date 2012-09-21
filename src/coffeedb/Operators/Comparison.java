@@ -1,7 +1,7 @@
 package coffeedb.operators;
 
-import coffeedb.Function;
 import coffeedb.Value;
+import coffeedb.functions.Function;
 
 public class Comparison extends Function {
 	public Predicate predicate;

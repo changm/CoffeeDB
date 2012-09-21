@@ -1,21 +1,20 @@
 package coffeedb.operators;
 
-import coffeedb.Function;
 import coffeedb.Schema;
 import coffeedb.Tuple;
 import coffeedb.Value;
+import coffeedb.functions.Function;
 
 
 public class FilterOperator extends Operator {
-	private Function _comparison;
+	private Function _filter;
 	private Operator _operator;
 	private int _columnIndex;
 	
-	public FilterOperator(Function compare, Operator child) {
-		assert (compare != null);
+	public FilterOperator(Function filter, Operator child) {
+		assert (filter!= null);
 		assert (child != null);
-		
-		_comparison = compare;
+		_filter = filter;
 		_operator = child;
 	}
 
@@ -28,13 +27,10 @@ public class FilterOperator extends Operator {
 	}
 
 	public Tuple getNext() {
-		Comparison compare = (Comparison) _comparison;
-		Predicate op = compare.predicate;
-		
 		while (_operator.hasNext()) {
 			Tuple tuple = _operator.next();
 			Value column = tuple.getValue(_columnIndex);
-			if (column.compare(op, compare.right)) {
+			if (_filter.filter(tuple)) {
 				return tuple;
 			}
 		}

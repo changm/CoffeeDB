@@ -1,8 +1,10 @@
 package coffeedb;
 
 import java.nio.ByteBuffer;
+
 import java.util.ArrayList;
 
+import coffeedb.functions.Function;
 import coffeedb.operators.Predicate;
 import coffeedb.types.Type;
 
@@ -145,7 +147,7 @@ public class Value {
 		case STRING:
 			return dataToString();
 		case FUNCTION:
-			return ((Function) this)._functionName;
+			return ((Function) this).getName();
 		default:
 			assert (false);
 			break;

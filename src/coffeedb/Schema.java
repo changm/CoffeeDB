@@ -101,6 +101,15 @@ public class Schema {
 		
 		return false;
 	}
+	
+	public int getIndex(String columnName) {
+		assert (_columnNames.contains(columnName));
+		return _columnNames.indexOf(columnName);
+	}
+	
+	public Type getColumnType(String columnName) {
+		return _columnTypes.get(getIndex(columnName));
+	}
 
 	private boolean equalSchema(Schema other) {
 		if (_columnNames.size() != other._columnNames.size()) return false;

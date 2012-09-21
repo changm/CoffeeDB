@@ -97,8 +97,9 @@ public class Parser {
 		eat(Token.SELECT);
 		
 		boolean allColumns = isToken(Token.ASTERIK);
+		String[] columns = null;
 		if (!allColumns) {
-			String[] columns = parseStrings();
+			columns = parseStrings();
 		} else {
 			eat(Token.ASTERIK);
 		}
@@ -118,7 +119,10 @@ public class Parser {
 		}
 		
 		assert (tables.length == 1);
-		return new ScanOperator(tables[0]);
+		ScanOperator scan = new ScanOperator(tables[0]);
+		if (allColumns) return scan;
+		
+		return new Projection(scan, tables[0], columns);
 	}
 
 	private void parseGroupBy() {
@@ -201,6 +205,7 @@ public class Parser {
 		while (isToken(Token.COMMA)) {
 			eat(Token.COMMA);
 			value = getIdent();
+			strings.add(value);
 			eat(Token.IDENT);
 		}
 		

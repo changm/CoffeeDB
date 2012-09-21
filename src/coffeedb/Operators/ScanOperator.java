@@ -18,10 +18,18 @@ public class ScanOperator extends Operator {
 	private String _tableName;
 	private Iterator<Tuple> _iterator;
 	private Table _table;
+	private String[] _columns;
 
+	// Assumes all columns
 	public ScanOperator(String tableName) {
 		_tableName = tableName;
 		_table = CoffeeDB.catalog().getTable(_tableName);
+	}
+	
+	public ScanOperator(String tableName, String[] columns) {
+		_tableName = tableName;
+		_table = CoffeeDB.catalog().getTable(_tableName);
+		_columns = columns;
 	}
 
 	public void open() {
