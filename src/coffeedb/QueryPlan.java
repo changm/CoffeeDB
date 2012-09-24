@@ -37,12 +37,6 @@ public class QueryPlan {
 		addOperator(insert);
 	}
 	
-	public FilterOperator addWhere(ScanOperator scan, Comparison compare) {
-		FilterOperator filter = new FilterOperator(compare, scan);
-		addOperator(filter);
-		return filter;
-	}
-
 	public Transaction getTransaction() {
 		return _transaction;
 	}

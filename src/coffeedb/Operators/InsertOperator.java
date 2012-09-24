@@ -16,8 +16,7 @@ import coffeedb.types.Type;
 
 public class InsertOperator extends Operator {
 	private String _tableName;
-	private Iterable<Tuple> _tuples;
-	private Iterator<Tuple> _tupleIter;
+	private List<Tuple> _tuples;
 	private boolean _didInsert;
 	
 	public InsertOperator(String tableName, Object...objects) {
@@ -30,45 +29,34 @@ public class InsertOperator extends Operator {
 		}
 	}
 	
-	public InsertOperator(String tableName, Iterable<Tuple> tuples) {
+	public InsertOperator(String tableName, List<Tuple> tuples) {
 		_tableName = tableName;
 		assert (tuples != null);
 		_tuples = tuples;
 	}
 	
-	public void open() {
-		_tupleIter = _tuples.iterator();
-	}
-
-	public void close() {
-	}
 	
-	private Tuple createResultTuple(int insertCount) {
+	private List<Tuple> createResultTuple(int insertCount) {
 		String resultString = "Inserted " + insertCount + " rows";
 		Value[] results = Value.createValueArray(resultString); 
-		return new Tuple(getSchema(), results);
+		
+		ArrayList<Tuple> resultList = new ArrayList<Tuple>();
+		resultList.add(new Tuple(getSchema(), results));
+		return resultList;
 	}
 
-	public Tuple getNext() {
+	public List<Tuple> getData() {
 		if (_didInsert) return null;
+		_didInsert = true;
 		
 		int insertCount = 0;
 		Catalog catalog = CoffeeDB.catalog();
+		
 		Table table = catalog.getTable(_tableName);
-		
-		while (_tupleIter.hasNext()) {
-			Tuple tuple = _tupleIter.next();
-			table.insertTuple(tuple);
-			insertCount++;
-		}
-		
-		_didInsert = true;
+		table.insertTuples(_tuples);
 		return createResultTuple(insertCount);
 	}
 	
-	public void reset() {
-		
-	}
 	
 	protected Schema getSchema() {
 		Schema schema = new Schema();

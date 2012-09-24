@@ -66,12 +66,10 @@ public class TestUtil {
 		if (!tableExists(tableName)) return false;
 		
 		ScanOperator scan = new ScanOperator(tableName);
-		scan.open();
-		while (scan.hasNext()) {
-			Tuple t = scan.next();
+		for (Tuple t : scan.getData()) {
 			if (t.equals(tuple)) return true;
 		}
-		scan.close();
+		
 		return false;
 	}
 }

@@ -1,8 +1,10 @@
 package coffeedb;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
+import java.util.List;
 
 public class Table implements Serializable {
 	private String _tableName;
@@ -10,12 +12,12 @@ public class Table implements Serializable {
 	
 	// Really is this it?
 	// Might get a lot harder once we have transactions
-	private LinkedHashSet<Tuple> _data;
+	private List<Tuple> _data;
 	
 	public Table(String tableName, Schema schema) {
 		_tableName = tableName;
 		_schema = schema;
-		_data = new LinkedHashSet<Tuple>();
+		_data = new ArrayList<Tuple>();
 	}
 	
 	public String getTableName() {
@@ -44,5 +46,13 @@ public class Table implements Serializable {
 	
 	public int getTupleCount() {
 		return _data.size();
+	}
+	
+	public List<Tuple> getData() {
+		return _data;
+	}
+	
+	public void insertTuples(List<Tuple> tuples) {
+		_data.addAll(tuples);
 	}
 }

@@ -122,7 +122,7 @@ public class Parser {
 		ScanOperator scan = new ScanOperator(tables[0]);
 		if (allColumns) return scan;
 		
-		return new Projection(scan, tables[0], columns);
+		return new Projection(scan, columns);
 	}
 
 	private void parseGroupBy() {

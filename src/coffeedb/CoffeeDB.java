@@ -1,5 +1,7 @@
 package coffeedb;
 
+import java.util.List;
+
 import coffeedb.parser.Parser;
 
 public class CoffeeDB {
@@ -35,12 +37,12 @@ public class CoffeeDB {
 	
 	private void printResults(Transaction transaction) {
 		assert (transaction.didCommit());
-		Tuple[] results = transaction.getResult();
+		List<Tuple> results = transaction.getResult();
 		for (Tuple tuple : results) {
 			System.out.println(tuple);
 		}
 		
-		if (results.length == 0) {
+		if (results.size() == 0) {
 			System.out.println("No rows selected");
 		}
 	}

@@ -1,9 +1,11 @@
 package coffeedb;
 
+import java.util.List;
+
 public class Transaction {
 	private static long NEXT_ID = 0;
 	private long _id;
-	private Tuple[] _result;
+	private List<Tuple> _result;
 	
 	private boolean _didFinish;
 	private boolean _didCommit;
@@ -18,7 +20,7 @@ public class Transaction {
 		return _id;
 	}
 	
-	public void commitTransaction(Tuple[] result) {
+	public void commitTransaction(List<Tuple> result) {
 		_didCommit = true;
 		_result = result;
 	}
@@ -27,7 +29,7 @@ public class Transaction {
 		_didCommit = false;
 	}
 
-	public Tuple[] getResult() {
+	public List<Tuple> getResult() {
 		return _result;
 	}
 	

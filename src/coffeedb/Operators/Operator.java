@@ -1,32 +1,32 @@
 package coffeedb.operators;
 
+import java.util.List;
+
 import coffeedb.Schema;
 import coffeedb.Tuple;
 
+/***
+ * Our definition of operator changes drastically compared to system R
+ * Instead of reading things tuple at a time, we throw the data to a function
+ * and the function processes all the data at once. Thus we don't actually have
+ * to keep calling next, we just say getData!
+ * @author masonchang
+ *
+ */
 public abstract class Operator {
-	protected Tuple _next = null;
+	protected Operator _child;
 	
 	public Operator() {
+		
 	}
 	
-	public boolean hasNext() {
-		if (_next == null) {
-			_next = getNext();
-		}
-		
-		return _next != null;
+	public Operator(Operator child) {
+		_child = child;
 	}
 	
-	public Tuple next() {
-		Tuple tuple = _next;
-		assert (tuple != null);
-		_next = null;
-		return tuple;
+	public Operator getChild() { 
+		return _child; 
 	}
-		
-	public abstract void open();
-	public abstract void reset();
-	public abstract void close();
-	protected abstract Tuple getNext();
-	protected abstract Schema getSchema();
+	
+	public abstract List<Tuple> getData(); 
 }
