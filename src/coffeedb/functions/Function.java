@@ -75,8 +75,9 @@ public class Function extends Value {
 		assert _builtinFunctions.containsKey(_functionName);
 		Method m = _builtinFunctions.get(_functionName);
 		try {
+			assert (m != null);
 			Object instance = null;
-			return (List<Tuple>) m.invoke(instance, data);
+			return (List<Tuple>) m.invoke(instance, data, _arguments);
 		} catch (IllegalArgumentException e) {
 			// TODO Auto-generated catch block
 			System.err.println("Illegal argument exception: " + e.toString());
@@ -88,9 +89,9 @@ public class Function extends Value {
 			e.printStackTrace();
 			assert (false);
 		} catch (InvocationTargetException e) {
-			// TODO Auto-generated catch block
-			assert (false);
+			System.err.println("Invocatoin Target Exception " + e.toString());
 			e.printStackTrace();
+			assert (false);
 		}
 		assert (false);
 		return null;

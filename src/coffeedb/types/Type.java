@@ -4,6 +4,7 @@ import coffeedb.parser.Token;
 
 public abstract class Type {
 	public boolean isInt() { return false; }
+	public boolean isDouble() { return false; }
 	public boolean isBlob() { return false; }
 	public boolean isString() { return false; }
 	public boolean isFunction() { return false; }
@@ -15,21 +16,25 @@ public abstract class Type {
 	private static StringType _stringType = new StringType(50);
 	private static LongType _longType = new LongType();
 	private static FunctionType _functionType = new FunctionType();
+	private static DoubleType _doubleType = new DoubleType();
 	
 	public static IntType getIntType() { return _intType; }
 	public static StringType getStringType() { return _stringType; }
 	public static LongType getLongType() { return _longType; }
-	public static Type getFunctionType() { return _functionType; }
+	public static FunctionType getFunctionType() { return _functionType; }
+	public static DoubleType getDoubleType() { return _doubleType; }
 	
 	public static Type getType(String typeName) {
 		if (typeName.equalsIgnoreCase("int")) {
-			return _intType;
+			return getIntType(); 
 		} else if (typeName.equalsIgnoreCase("blob")) {
 			return new BlobType();
 		} else if (typeName.equalsIgnoreCase("string")) {
-			return _stringType;
+			return getStringType();
 		} else if (typeName.equalsIgnoreCase("long")) {
-			return _longType;
+			return getLongType();
+		} else if (typeName.equalsIgnoreCase("double")) {
+			return getDoubleType();
 		}
 		
 		assert false : "Unknown type : " + typeName;
@@ -62,6 +67,7 @@ public abstract class Type {
 		case LONG: return getLongType();
 		case STRING: return getStringType();
 		case FUNCTION: return getFunctionType();
+		case DOUBLE: return getDoubleType();
 		case BLOB: {
 			assert (false);
 			return null;
@@ -79,6 +85,7 @@ public abstract class Type {
 		case INT: return getIntType();
 		case STRING: return getStringType();
 		case LONG: return getLongType();
+		case DOUBLE: return getDoubleType();
 		default: assert (false);
 		}
 		

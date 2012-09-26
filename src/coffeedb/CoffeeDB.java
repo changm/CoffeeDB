@@ -132,9 +132,14 @@ public class CoffeeDB {
 		
 		database.runQuery("create table test (a int, b int);");
 		database.runQuery("insert into test values (10, 20);");
+		database.runQuery("insert into test values (30, 20);");
 		database.runQuery("select * from test;");
 		//database.runQuery("select a from test;");
 		database.runQuery("select count(a) from test;");
+		database.runQuery("select sum(a) from test;");
+		database.runQuery("select min(a) from test;");
+		database.runQuery("select max(a) from test;");
+		database.runQuery("select avg(a) from test;");
 		//database.runQuery("select * from test;");
 		//database.test();
 		/*

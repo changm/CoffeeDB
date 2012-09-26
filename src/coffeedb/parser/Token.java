@@ -31,5 +31,6 @@ public enum Token {
 	VARCHAR,
 	BLOB, 
 	LONG, 
-	EOF
+	DOUBLE,
+	EOF, 
 };

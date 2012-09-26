@@ -49,7 +49,7 @@ public class InsertOperator extends Operator {
 		if (_didInsert) return null;
 		_didInsert = true;
 		
-		int insertCount = 0;
+		int insertCount = _tuples.size();
 		Catalog catalog = CoffeeDB.catalog();
 		
 		Table table = catalog.getTable(_tableName);

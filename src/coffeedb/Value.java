@@ -55,6 +55,12 @@ public class Value {
 			break;
 		}
 	}
+	
+	private void setDouble(double doubleVal) {
+		assert (_type.isDouble());
+		_buffer.putDouble(doubleVal);
+		_data = _buffer.array();
+	}
 
 	public void setInt(int value) {
 		assert (_type.isInt());
@@ -122,12 +128,20 @@ public class Value {
 			return createInt((Integer) value);
 		} else if (value instanceof String) {
 			return createString((String) value);
+		} else if (value instanceof Double) {
+			return createDouble((Double) value);
 		}
 		
 		assert (false);
 		return null;
 	}
 	
+	private static Value createDouble(double doubleVal) {
+		Value value = new Value(Type.getDoubleType());
+		value.setDouble(doubleVal);
+		return value;
+	}
+
 	public static Value createInt(int intVal) {
 		Value value = new Value(Type.getIntType());
 		value.setInt(intVal);
@@ -148,6 +162,8 @@ public class Value {
 			return dataToString();
 		case FUNCTION:
 			return ((Function) this).getName();
+		case DOUBLE:
+			return Double.toString(toDouble());
 		default:
 			assert (false);
 			break;
@@ -164,6 +180,12 @@ public class Value {
 		assert (_type.isInt());
 		ByteBuffer wrapper = ByteBuffer.wrap(_data);
 		return wrapper.getInt();
+	}
+	
+	public double toDouble() {
+		assert (_type.isDouble());
+		ByteBuffer wrapper = ByteBuffer.wrap(_data);
+		return wrapper.getDouble();
 	}
 
 	public byte[] getData() {

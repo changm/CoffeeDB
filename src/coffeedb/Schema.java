@@ -131,4 +131,8 @@ public class Schema {
 		assert (_columnNames.size() == _columnTypes.size());
 		return _columnNames.size();
 	}
+	
+	public boolean hasColumn(String columnName) {
+		return _columnNames.contains(columnName);
+	}
 }

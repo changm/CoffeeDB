@@ -27,38 +27,91 @@ import coffeedb.types.Type;
  * @author masonchang
  *
  */
-public class AggregateFunctions extends Function {
-	public static Aggregate _op;
-	
-	public AggregateFunctions(String name, String[] arguments, Aggregate op) {
-		super(name, arguments);
-		_op = op;
+public class AggregateFunctions {
+	private static Schema createIntSchema(String aggregateName) {
+		Schema schema = new Schema();
+		schema.addColumn(aggregateName, Type.getIntType());
+		return schema;
 	}
 	
-	public static List<Tuple> sum(List<Tuple> data) {
-		assert false : "Not yet implemented";
-		return null;
+	private static Schema createDoubleSchema(String aggregateName) {
+		Schema schema = new Schema();
+		schema.addColumn(aggregateName, Type.getDoubleType());
+		return schema;
+	}
+	
+	public static List<Tuple> sum(List<Tuple> data, String[] arguments) {
+		assert (arguments.length == 1);
+		String column = arguments[0];
+		//String groupBy = arguments[1];
+		
+		int sum = 0;
+		for (Tuple t : data) {
+			assert (t.getSchema().hasColumn(column));
+			int value = t.getValue(column).toInt();
+			sum += value;
+		}
+		
+		Schema schema = createIntSchema("sum");
+		Tuple result = new Tuple(schema, sum);
+		return Tuple.createList(result);
 	}
 
-	public static List<Tuple> min(List<Tuple> data) {
-		assert false : "Not yet implemented";
-		return null;
+	public static List<Tuple> min(List<Tuple> data, String[] arguments) {
+		assert (arguments.length == 1);
+		String column = arguments[0];
+		
+		int min = Integer.MAX_VALUE;
+		for (Tuple t : data) {
+			int value = t.getValue(column).toInt();
+			if (value < min) {
+				min = value;
+			}
+		}
+		
+		Schema schema = createIntSchema("min");
+		Tuple result = new Tuple(schema, min);
+		return Tuple.createList(result);
 	}
 
-	public static List<Tuple> max(List<Tuple> data) {
-		assert false : "Not yet implemented";
-		return null;
+	public static List<Tuple> max(List<Tuple> data, String[] arguments) {
+		assert (arguments.length == 1);
+		String column = arguments[0];
+		
+		int max = Integer.MIN_VALUE;
+		for (Tuple t : data) {
+			int value = t.getValue(column).toInt();
+			if (value > max) {
+				max = value;
+			}
+		}
+		
+		Schema schema = createIntSchema("max");
+		Tuple result = new Tuple(schema, max);
+		return Tuple.createList(result);
 	}
 
-	public static List<Tuple> count(List<Tuple> data) {
+	public static List<Tuple> count(List<Tuple> data, String[] arguments) {
 		Value[] values = Value.createValueArray(data.size());
 		Schema schema = new Schema();
 		schema.addColumn("count", Type.getIntType());
 		return Tuple.createList(new Tuple(schema, values));
 	}
 
-	public static List<Tuple> average(List<Tuple> data) {
-		assert false : "Not yet implemented";
-		return null;
+	public static List<Tuple> avg(List<Tuple> data, String[] arguments) {
+		assert (arguments.length == 1);
+		String column = arguments[0];
+		
+		double sum = 0;
+		for (Tuple t : data) {
+			int value = t.getValue(column).toInt();
+			sum += value;
+		}
+		
+		double average = sum / data.size();
+		
+		Schema schema = createDoubleSchema("average");
+		Tuple result = new Tuple(schema, average);
+		return Tuple.createList(result);
 	}
 }
