@@ -28,5 +28,9 @@ public abstract class Operator {
 		return _child; 
 	}
 	
+	public void setChild(Operator op) {
+		_child = op;
+	}
+	
 	public abstract List<Tuple> getData(); 
 }

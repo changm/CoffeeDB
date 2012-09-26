@@ -7,6 +7,7 @@ import coffeedb.QueryPlan;
 import coffeedb.Schema;
 import coffeedb.Tuple;
 import coffeedb.Value;
+import coffeedb.functions.Function;
 import coffeedb.operators.*;
 import coffeedb.types.Type;
 
@@ -92,18 +93,48 @@ public class Parser {
 		_current = _scanner.next();
 		return _current;
 	}
+	
+	private Operator parseSelectExpression() {
+		if (isToken(Token.ASTERIK)) {
+			eat(Token.ASTERIK);
+			return new Projection();
+		}
+		
+		assert (isToken(Token.IDENT));
+		String ident = getIdent();
+		eat(Token.IDENT);
+		
+		if (isToken(Token.LEFT_PAREN)) {
+			return parseFunction(ident);
+		}
+		
+		ArrayList<String> columns = new ArrayList<String>();
+		columns.add(ident);
+		
+		while (isToken(Token.COMMA)) {
+			eat(Token.COMMA);
+			columns.add(getIdent());
+			eat(Token.IDENT);
+		}
+		
+		return new Projection(null, columns.toArray(new String[columns.size()]));
+	}
+
+	private Operator parseFunction(String functionName) {
+		eat(Token.LEFT_PAREN);
+		
+		assert (isToken(Token.IDENT));
+		String[] arguments = parseStrings();
+		eat(Token.RIGHT_PAREN);
+		
+		Function function = new Function(functionName, arguments);
+		return new FunctionOperator(function);
+	}
 
 	private Operator parseSelect() {
 		eat(Token.SELECT);
 		
-		boolean allColumns = isToken(Token.ASTERIK);
-		String[] columns = null;
-		if (!allColumns) {
-			columns = parseStrings();
-		} else {
-			eat(Token.ASTERIK);
-		}
-		
+		Operator select = parseSelectExpression();
 		eat(Token.FROM);
 		String[] tables = parseStrings();
 		
@@ -120,9 +151,8 @@ public class Parser {
 		
 		assert (tables.length == 1);
 		ScanOperator scan = new ScanOperator(tables[0]);
-		if (allColumns) return scan;
-		
-		return new Projection(scan, columns);
+		select.setChild(scan);
+		return select;
 	}
 
 	private void parseGroupBy() {

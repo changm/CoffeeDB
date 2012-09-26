@@ -126,4 +126,9 @@ public class Schema {
 		
 		return true;
 	}
+	
+	public int columnCount() {
+		assert (_columnNames.size() == _columnTypes.size());
+		return _columnNames.size();
+	}
 }

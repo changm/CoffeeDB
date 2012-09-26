@@ -11,14 +11,14 @@ public class TestUtil {
 		
 		Type[] types = new Type[1];
 		types[0] = Type.getIntType();
-		
+
 		return new Schema(names, types);
 	}
-	
+
 	public static Table getSimpleTable(String tableName) {
 		return new Table(tableName, getSimpleSchema());
 	}
-	
+
 	public static Table createSimpleTable(String tableName) {
 		Catalog catalog = CoffeeDB.catalog();
 		Table table = getSimpleTable(tableName);
@@ -32,17 +32,17 @@ public class TestUtil {
 		schema.addColumn("intVal", Type.getIntType());
 		return new Tuple(schema, values);
 	}
-	
+
 	public static Tuple createSimpleTuple(Schema schema) {
 		Tuple testTuple = new Tuple(schema);
 		for (int i = 0; i < schema.numberOfColumns(); i++) {
 			Type schemaType = schema._columnTypes.get(i);
 			testTuple.setValue(i, createRandomValue(schemaType));
 		}
-		
+
 		return testTuple;
 	}
-	
+
 	private static Value createRandomValue(Type schemaType) {
 		Value value = new Value(schemaType);
 		switch (schemaType.getEnum()) {
@@ -54,22 +54,24 @@ public class TestUtil {
 			assert (false);
 			break;
 		}
-		
+
 		return value;
 	}
-	
+
 	public static boolean tableExists(String tableName) {
 		return CoffeeDB.getInstance().getCatalog().tableExists(tableName);
 	}
 
 	public static boolean tupleExists(String tableName, Tuple tuple) {
-		if (!tableExists(tableName)) return false;
-		
+		if (!tableExists(tableName))
+			return false;
+
 		ScanOperator scan = new ScanOperator(tableName);
 		for (Tuple t : scan.getData()) {
-			if (t.equals(tuple)) return true;
+			if (t.equals(tuple))
+				return true;
 		}
-		
+
 		return false;
 	}
 }

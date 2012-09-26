@@ -55,13 +55,14 @@ public class CoffeeDB {
 		getLogger().recoverFromSnapshot(this);
 	}
 	
-	public void runQuery(String query) {
+	public List<Tuple> runQuery(String query) {
 		Parser parser = new Parser();
 		QueryPlan plan = parser.parseQuery(query);
 		
 		Transaction transaction = _engine.executeQueryPlan(plan);
 		assert (transaction.didCommit());
 		printResults(transaction);
+		return transaction.getResult();
 		/*
 		while (!transaction.didCommit()) {
 			try {
@@ -129,11 +130,11 @@ public class CoffeeDB {
 		CoffeeDB database = CoffeeDB.getInstance();
 		database.setConfig(config);
 		
-		
 		database.runQuery("create table test (a int, b int);");
 		database.runQuery("insert into test values (10, 20);");
 		database.runQuery("select * from test;");
-		database.runQuery("select a from test;");
+		//database.runQuery("select a from test;");
+		database.runQuery("select count(a) from test;");
 		//database.runQuery("select * from test;");
 		//database.test();
 		/*

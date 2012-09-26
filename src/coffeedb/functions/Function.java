@@ -1,6 +1,9 @@
 package coffeedb.functions;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import coffeedb.Tuple;
@@ -31,28 +34,69 @@ import coffeedb.types.Type;
  */
 public class Function extends Value {
 	protected String _functionName;
-	protected List<Value> _arguments;
+	protected String[] _arguments;
 	
-	public Function(String name, List<Value> arguments) {
+	// Didn't know Java has this problem, but 
+	// Builtin classes has to be defined prior to builtin functions
+	// Static initializers are in the order they are declared
+	private static Class[] _builtinClasses = {
+			AggregateFunctions.class, Comparison.class
+	};
+	private static HashMap<String, Method> _builtinFunctions = initFunctions();
+	
+	private static HashMap<String, Method> initFunctions() {
+		HashMap<String, Method> functions = new HashMap<String, Method>();
+		assert _builtinClasses != null : "Builtin classes defined AFTER functions. Incorrect";
+		
+		for (Class builtinClass : _builtinClasses) {
+			addMethods(functions, builtinClass);
+		}
+		
+		return functions;
+	}
+	
+	private static void addMethods(HashMap<String, Method> functions,
+			Class builtinClass) {
+		for (Method builtinMethod : builtinClass.getDeclaredMethods()) {
+			String methodName = builtinMethod.getName();
+			//System.out.println("Adding method: " + methodName);
+			assert (!functions.containsKey(methodName));
+			functions.put(methodName, builtinMethod);
+		}
+	}
+
+	public Function(String name, String[] arguments) {
 		super(Type.getFunctionType());
 		_functionName = name;
 		_arguments = arguments;
 	}
-	
-	public Function(String name, Value...values) {
-		super (Type.getFunctionType());
-		_functionName = name;
-		_arguments = new ArrayList<Value>();
-		for (Value v : values) {
-			_arguments.add(v);
+
+	public List<Tuple> execute(List<Tuple> data) {
+		assert _builtinFunctions.containsKey(_functionName);
+		Method m = _builtinFunctions.get(_functionName);
+		try {
+			Object instance = null;
+			return (List<Tuple>) m.invoke(instance, data);
+		} catch (IllegalArgumentException e) {
+			// TODO Auto-generated catch block
+			System.err.println("Illegal argument exception: " + e.toString());
+			assert (false);
+			e.printStackTrace();
+		} catch (IllegalAccessException e) {
+			// TODO Auto-generated catch block
+			System.err.println("Illegal access exception " + e.toString());
+			e.printStackTrace();
+			assert (false);
+		} catch (InvocationTargetException e) {
+			// TODO Auto-generated catch block
+			assert (false);
+			e.printStackTrace();
 		}
+		assert (false);
+		return null;
 	}
 	
 	public boolean isFunction() { return true; }
 	public String getName() { return _functionName; }
 	
-	public List<Tuple> execute(List<Tuple> data) {
-		assert (false);
-		return null;
-	}
 }

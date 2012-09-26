@@ -2,8 +2,10 @@ package coffeedb.functions;
 
 import java.util.List;
 
+import coffeedb.Schema;
 import coffeedb.Tuple;
 import coffeedb.Value;
+import coffeedb.types.Type;
 
 /***
  * Aggregate functions here
@@ -26,15 +28,37 @@ import coffeedb.Value;
  *
  */
 public class AggregateFunctions extends Function {
-	private Aggregate _op;
+	public static Aggregate _op;
 	
-	public AggregateFunctions(String name, List<Value> arguments, Aggregate op) {
+	public AggregateFunctions(String name, String[] arguments, Aggregate op) {
 		super(name, arguments);
 		_op = op;
 	}
 	
-	public List<Tuple> execute(List<Tuple> data) {
-		assert (false);
+	public static List<Tuple> sum(List<Tuple> data) {
+		assert false : "Not yet implemented";
+		return null;
+	}
+
+	public static List<Tuple> min(List<Tuple> data) {
+		assert false : "Not yet implemented";
+		return null;
+	}
+
+	public static List<Tuple> max(List<Tuple> data) {
+		assert false : "Not yet implemented";
+		return null;
+	}
+
+	public static List<Tuple> count(List<Tuple> data) {
+		Value[] values = Value.createValueArray(data.size());
+		Schema schema = new Schema();
+		schema.addColumn("count", Type.getIntType());
+		return Tuple.createList(new Tuple(schema, values));
+	}
+
+	public static List<Tuple> average(List<Tuple> data) {
+		assert false : "Not yet implemented";
 		return null;
 	}
 }

@@ -4,6 +4,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
+import java.util.List;
 
 import coffeedb.types.Type;
 
@@ -16,6 +17,16 @@ import coffeedb.types.Type;
 public class Tuple {
 	private Value[] _values;
 	private Schema _schema;
+	
+	public static List<Tuple> createList(Object...objects) {
+		ArrayList<Tuple> result = new ArrayList<Tuple>();
+		for (Object o : objects) {
+			Tuple t = (Tuple) o;
+			result.add(t);
+		}
+		
+		return result;
+	}
 	
 	public Tuple(Schema schema) {
 		assert (schema != null);
@@ -35,6 +46,18 @@ public class Tuple {
 		_schema = schema;
 	}
 	
+	public Tuple (Value[] values) {
+		_values = values;
+		createSchema(values);
+	}
+	
+	private void createSchema(Value[] values) {
+		_schema = new Schema();
+		for (Value v : values) {
+			_schema.addColumn("", v.getType());
+		}
+	}
+
 	public Tuple(Schema schema, Iterable<Value> values) {
 		_schema = schema;
 		setValues(values);
