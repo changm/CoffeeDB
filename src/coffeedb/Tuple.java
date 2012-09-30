@@ -87,6 +87,11 @@ public class Tuple {
 		_values[column] = value;
 	}
 	
+	public void setValue(String column, Value value) {
+		int columnIndex = getIndex(column);
+		_values[columnIndex] = value;
+	}
+	
 	public Value getValue(int column) {
 		assert (column < _values.length);
 		return _values[column];
@@ -96,7 +101,7 @@ public class Tuple {
 		int index = getIndex(columnName);
 		return getValue(index);
 	}
-	
+
 	public String toString() {
 		StringBuffer sb = new StringBuffer();
 		for (Value v : _values) {
@@ -123,7 +128,7 @@ public class Tuple {
 			if (column.equalsIgnoreCase(columnName)) return i;
 		}
 		
-		assert false : "Unknown column";
+		assert false : "Unknown column " + columnName;
 		return -1;
 	}
 	

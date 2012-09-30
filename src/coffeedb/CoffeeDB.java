@@ -134,44 +134,10 @@ public class CoffeeDB {
 		database.runQuery("insert into test values (10, 20);");
 		database.runQuery("insert into test values (30, 20);");
 		database.runQuery("select * from test;");
-		//database.runQuery("select a from test;");
-		database.runQuery("select count(a) from test;");
-		database.runQuery("select sum(a) from test;");
-		database.runQuery("select min(a) from test;");
-		database.runQuery("select max(a) from test;");
-		database.runQuery("select avg(a) from test;");
-		//database.runQuery("select * from test;");
-		//database.test();
-		/*
-		database.runQuery("create table test (a int, b int)");
-		database.runQuery("insert into test values (10, 20);");
+		database.runQuery("update test SET a = 50 where b = 20;");
 		database.runQuery("select * from test;");
-		database.runQuery("select count(a) from test");
-		database.snapshot();
-		*/
 		
-		/*
-		Catalog catalog = database.getCatalog();
-		Schema testSchema = catalog.getTable("test").getSchema();
-		
-		database.reset();
-		database.recoverFromLog();
-		
-		Schema recoverSchema = catalog.getTable("test").getSchema();
-		assert (testSchema.equals(recoverSchema));
-		
-		database.runQuery("select * from test;");
-		*/
 		database.shutdown();
-		
-		/*
-		database.runQuery("insert into test values (10, 20);");
-		database.runQuery("select * from test;");
-		
-		System.out.println("Running where");
-		database.runQuery("select * from test where test.a < 15");
-		database.shutdown();
-		*/
 	}
 
-	}
+}

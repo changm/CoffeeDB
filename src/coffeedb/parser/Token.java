@@ -16,6 +16,7 @@ public enum Token {
 	CREATE,
 	INTO,
 	VALUES,
+	SET,
 	
 	// Symbols
 	LEFT_PAREN,
@@ -24,6 +25,7 @@ public enum Token {
 	ASTERIK, 
 	COMMA, 
 	SEMI_COLON,
+	EQUALS,
 	
 	// Types
 	INT,

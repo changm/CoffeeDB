@@ -40,7 +40,7 @@ public class Function extends Value {
 	// Builtin classes has to be defined prior to builtin functions
 	// Static initializers are in the order they are declared
 	private static Class[] _builtinClasses = {
-			AggregateFunctions.class, Comparison.class
+			AggregateFunctions.class, Comparison.class, FilterFunctions.class
 	};
 	private static HashMap<String, Method> _builtinFunctions = initFunctions();
 	
@@ -72,7 +72,7 @@ public class Function extends Value {
 	}
 
 	public List<Tuple> execute(List<Tuple> data) {
-		assert _builtinFunctions.containsKey(_functionName);
+		assert _builtinFunctions.containsKey(_functionName) : _functionName + " is not a builtin function";
 		Method m = _builtinFunctions.get(_functionName);
 		try {
 			assert (m != null);

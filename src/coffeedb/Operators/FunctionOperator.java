@@ -18,21 +18,8 @@ public class FunctionOperator extends Operator {
 	}
 
 	public List<Tuple> getData() {
-		/*
-		if (_function == null) {
-			bindFunction();
-		}
-		*/
-		
 		assert (_child != null);
 		List<Tuple> data = _child.getData();
 		return _function.execute(data);
 	}
-
-	/*
-	private void bindFunction() {
-		assert (_functionName != null);
-		_function = Function.lookup(_functionName);
-	}
-	*/
 }

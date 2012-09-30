@@ -1,6 +1,7 @@
 package coffeedb.parser;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import coffeedb.CoffeeDB;
 import coffeedb.QueryPlan;
@@ -36,8 +37,10 @@ public class Parser {
 			operator = parseCreate();
 			break;
 		case UPDATE:
-			default:
-				assert (false);
+			operator = parseUpdate();
+			break;
+		default:
+			assert (false);
 		}
 		
 		assert (operator != null);
@@ -47,6 +50,98 @@ public class Parser {
 		plan.addOperator(operator);
 		return plan;
 	}
+	
+	private Operator parseUpdate() {
+		eat(Token.UPDATE);
+		assert (isToken(Token.IDENT));
+		String tableName = getIdent();
+		eat(Token.IDENT);
+		
+		Operator set = parseSet(tableName);
+		
+		Operator whereOp = parseWhere();
+		ScanOperator scan = new ScanOperator(tableName);
+		whereOp.setChild(scan);
+		
+		set.setChild(whereOp);
+		return set;
+	}
+	
+	private Operator parseSet(String tableName) {
+		eat(Token.SET);
+		ArrayList<String> columns = new ArrayList<String>();
+		ArrayList<String> values = new ArrayList<String>();
+		
+		String column = getIdent();
+		eat(Token.IDENT);
+		eat (Token.EQUALS);
+		String value = getIdent();
+		eat(Token.IDENT);
+		
+		columns.add(column);
+		values.add(value);
+		
+		while (isToken(Token.COMMA)) {
+			eat (Token.COMMA);
+			column = getIdent();
+			eat(Token.IDENT);
+			eat(Token.EQUALS);
+			value = getIdent();
+			eat(Token.IDENT);
+		
+			columns.add(column);
+			values.add(value);
+		}
+		
+		Value[] valuesArray = convertIntoValues(tableName, values);
+		String[] columnsArray = new String[columns.size()];
+		columns.toArray(columnsArray);
+		return new SetOperator(columnsArray, valuesArray);
+	}
+
+	private Operator parseWhere() {
+		eat (Token.WHERE);
+		ArrayList<String> columns = new ArrayList<String>();
+		ArrayList<String> values = new ArrayList<String>();
+		
+		String column = getIdent();
+		eat(Token.IDENT);
+		eat (Token.EQUALS);
+		String value = getIdent();
+		eat(Token.IDENT);
+		
+		columns.add(column);
+		values.add(value);
+		
+		while (isToken(Token.COMMA)) {
+			eat (Token.COMMA);
+			column = getIdent();
+			eat(Token.IDENT);
+			eat (Token.EQUALS);
+			value = getIdent();
+			eat(Token.IDENT);
+		
+			columns.add(column);
+			values.add(value);
+		}
+		
+		String functionName = "where";
+		assert (columns.size() == values.size());
+		String[] arguments = new String[(columns.size() * 2) + 1];
+		arguments[arguments.length -1] = Predicate.EQUALS.toString();
+		
+		for (int i = 0; i < columns.size(); i++) {
+			column = columns.get(i);
+			value = values.get(i);
+		
+			arguments[i] = column;
+			arguments[i+1] = value;
+		}
+		
+		Function whereFunction = new Function(functionName, arguments);
+		return new FilterOperator(null, whereFunction, Predicate.EQUALS);
+	}
+
 
 	private Operator parseCreate() {
 		eat(Token.CREATE);
@@ -146,7 +241,6 @@ public class Parser {
 			eat(Token.GROUP);
 			eat(Token.BY);
 			parseGroupBy();
-			
 		}
 		
 		assert (tables.length == 1);
@@ -159,11 +253,7 @@ public class Parser {
 		assert false : "Not yet implemented";
 	}
 
-	private void parseWhere() {
-		assert false : "Not yet implemented";
-	}
-
-	// Parse String, Deliminated, By, Comma
+		// Parse String, Deliminated, By, Comma
 	private String[] parseStrings() {
 		ArrayList<String> strings = new ArrayList<String>();
 		String ident = getIdent();
@@ -211,8 +301,14 @@ public class Parser {
 		Tuple tuple = convertIntoTuple(tableName, values);
 		return new InsertOperator(tableName, tuple);
 	}
-
-	private Tuple convertIntoTuple(String tableName, String[] stringValues) {
+	
+	private Value[] convertIntoValues(String tableName, List<String> stringValues) {
+		String[] store = new String[stringValues.size()];
+		stringValues.toArray(store);
+		return convertIntoValues(tableName, store);
+	}
+	
+	private Value[] convertIntoValues(String tableName, String[] stringValues) {
 		Schema tableSchema = CoffeeDB.catalog().getTable(tableName).getSchema();
 		Value[] values = new Value[stringValues.length];
 		
@@ -223,6 +319,12 @@ public class Parser {
 			values[i] = value;
 		}
 		
+		return values;
+	}
+
+	private Tuple convertIntoTuple(String tableName, String[] stringValues) {
+		Value[] values = convertIntoValues(tableName, stringValues);
+		Schema tableSchema = CoffeeDB.catalog().getTable(tableName).getSchema();
 		return new Tuple(tableSchema, values);
 	}
 

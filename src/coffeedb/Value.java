@@ -82,6 +82,8 @@ public class Value {
 		switch (predicate) {
 		case LESS:
 			return !greaterThan(this, other);
+		case EQUALS:
+			return this.equals(other);
 		default:
 			assert (false);
 			return false;

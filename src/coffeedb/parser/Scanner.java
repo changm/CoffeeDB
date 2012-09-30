@@ -32,6 +32,7 @@ public class Scanner {
 		_tokenNames.put(")", Token.RIGHT_PAREN);
 		_tokenNames.put(",", Token.COMMA);
 		_tokenNames.put(";", Token.SEMI_COLON);
+		_tokenNames.put("=", Token.EQUALS);
 	}
 
 	private boolean isEOF() {
@@ -68,6 +69,7 @@ public class Scanner {
 	}
 
 	private Token getToken(String result) {
+		result = result.toLowerCase();
 		if (_tokenNames.containsKey(result)) {
 			return _tokenNames.get(result);
 		}

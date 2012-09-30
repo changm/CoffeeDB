@@ -1,6 +1,8 @@
 package coffeedb.test;
 
 import coffeedb.*;
+
+import static org.junit.Assert.*;
 import coffeedb.operators.ScanOperator;
 import coffeedb.types.*;
 
@@ -73,5 +75,12 @@ public class TestUtil {
 		}
 
 		return false;
+	}
+	
+	public static void assertColumnIsValue(String tableName, String column, Value value) {
+		ScanOperator scan = new ScanOperator(tableName);
+		for (Tuple t : scan.getData()) {
+			assertTrue(t.getValue(column).equals(value));
+		}
 	}
 }
