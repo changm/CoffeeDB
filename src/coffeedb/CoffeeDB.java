@@ -134,8 +134,10 @@ public class CoffeeDB {
 		database.runQuery("insert into test values (10, 20);");
 		database.runQuery("insert into test values (30, 20);");
 		database.runQuery("select * from test;");
-		database.runQuery("update test SET a = 50 where b = 20;");
+		database.runQuery("update test SET a = 50 where b = 20;"); 
 		database.runQuery("select * from test;");
+		database.runQuery("drop table test;");
+		
 		
 		database.shutdown();
 	}

@@ -1,6 +1,7 @@
 package coffeedb.test;
 
 import static org.junit.Assert.*;
+import static org.junit.Assert.assertTrue;
 
 import org.junit.After;
 import org.junit.AfterClass;
@@ -8,11 +9,12 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import coffeedb.Catalog;
+import coffeedb.CoffeeDB;
+import coffeedb.Schema;
 import coffeedb.Table;
-import coffeedb.Tuple;
 
-public class InsertTests {
-
+public class DropTests {
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
 	}
@@ -31,12 +33,13 @@ public class InsertTests {
 	}
 	
 	@Test
-	public void testInsert() {
-		String tableName = "test";
-		Table table = TestUtil.createSimpleTable(tableName);
-		
-		Tuple testTuple = TestUtil.createSimpleTuple();
-		table.insertTuple(testTuple);
-		assertTrue(table.hasTuple(testTuple));
+	public void testDropTable() {
+		CoffeeDB database = CoffeeDB.getInstance();
+		database.runQuery("create table test (a int, b int);");
+		database.runQuery("insert into test values (10, 20);");
+		database.runQuery("insert into test values (30, 20);");
+		database.runQuery("drop table test;");
+		assertFalse(database.getCatalog().tableExists("test"));
 	}
+
 }

@@ -39,6 +39,9 @@ public class Parser {
 		case UPDATE:
 			operator = parseUpdate();
 			break;
+		case DROP:
+			operator = parseDrop();
+			break;
 		default:
 			assert (false);
 		}
@@ -51,6 +54,14 @@ public class Parser {
 		return plan;
 	}
 	
+	private Operator parseDrop() {
+		eat(Token.DROP);
+		eat(Token.TABLE);
+		String tableName = getIdent();
+		eat(Token.IDENT);
+		return new DropOperator(tableName);
+	}
+
 	private Operator parseUpdate() {
 		eat(Token.UPDATE);
 		assert (isToken(Token.IDENT));
@@ -145,8 +156,7 @@ public class Parser {
 
 	private Operator parseCreate() {
 		eat(Token.CREATE);
-		assert (getIdent().equalsIgnoreCase("table"));
-		eat(Token.IDENT);
+		eat(Token.TABLE);
 		
 		String tableName = getIdent();
 		eat(Token.IDENT);

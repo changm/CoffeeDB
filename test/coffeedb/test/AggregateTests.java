@@ -25,6 +25,7 @@ public class AggregateTests {
 
 	@Before
 	public void setUp() throws Exception {
+		TestUtil.reset();
 		CoffeeDB database = CoffeeDB.getInstance();
 		database.runQuery("create table test (a int, b int);");
 		database.runQuery("insert into test values (10, 20);");

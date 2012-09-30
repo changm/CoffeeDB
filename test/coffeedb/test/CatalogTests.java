@@ -22,6 +22,7 @@ public class CatalogTests {
 
 	@Before
 	public void setUp() throws Exception {
+		TestUtil.reset();
 	}
 
 	@After

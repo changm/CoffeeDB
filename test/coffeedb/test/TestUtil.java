@@ -83,4 +83,9 @@ public class TestUtil {
 			assertTrue(t.getValue(column).equals(value));
 		}
 	}
+	
+	public static void reset() {
+		CoffeeDB database = CoffeeDB.getInstance();
+		database.reset();
+	}
 }

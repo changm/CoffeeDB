@@ -26,6 +26,7 @@ public class LoggerTest {
 
 	@Before
 	public void setUp() throws Exception {
+		TestUtil.reset();
 	}
 
 	@After

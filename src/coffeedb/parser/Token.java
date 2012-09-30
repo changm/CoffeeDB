@@ -17,6 +17,8 @@ public enum Token {
 	INTO,
 	VALUES,
 	SET,
+	DROP,
+	TABLE,
 	
 	// Symbols
 	LEFT_PAREN,

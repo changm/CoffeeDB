@@ -24,6 +24,7 @@ public class SystemTest {
 
 	@Before
 	public void setUp() throws Exception {
+		TestUtil.reset();
 	}
 
 	@After
