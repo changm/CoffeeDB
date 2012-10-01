@@ -28,6 +28,8 @@ public enum Token {
 	COMMA, 
 	SEMI_COLON,
 	EQUALS,
+	LESS,
+	GREATER,
 	
 	// Types
 	INT,

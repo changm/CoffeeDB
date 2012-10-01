@@ -8,12 +8,12 @@ import coffeedb.Value;
 public class Comparison extends Function {
 	private Compare _op;
 
-	public Comparison(String name, String[] arguments, Compare op) {
-		super(name, arguments);
-		_op = op;
+	public Comparison(String name) {
+		super(name);
 	}
 	
 	public List<Tuple> execute(List<Tuple> data) {
+		assert (false);
 		return null;
 	}
 

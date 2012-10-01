@@ -34,13 +34,12 @@ import coffeedb.types.Type;
  */
 public class Function extends Value {
 	protected String _functionName;
-	protected String[] _arguments;
 	
 	// Didn't know Java has this problem, but 
 	// Builtin classes has to be defined prior to builtin functions
 	// Static initializers are in the order they are declared
 	private static Class[] _builtinClasses = {
-			AggregateFunctions.class, Comparison.class, FilterFunctions.class
+			AggregateFunction.class, Comparison.class, FilterFunction.class
 	};
 	private static HashMap<String, Method> _builtinFunctions = initFunctions();
 	
@@ -60,15 +59,9 @@ public class Function extends Value {
 		for (Method builtinMethod : builtinClass.getDeclaredMethods()) {
 			String methodName = builtinMethod.getName();
 			//System.out.println("Adding method: " + methodName);
-			assert (!functions.containsKey(methodName));
+			//assert (!functions.containsKey(methodName));
 			functions.put(methodName, builtinMethod);
 		}
-	}
-
-	public Function(String name, String[] arguments) {
-		super(Type.getFunctionType());
-		_functionName = name;
-		_arguments = arguments;
 	}
 
 	public List<Tuple> execute(List<Tuple> data) {
@@ -76,8 +69,7 @@ public class Function extends Value {
 		Method m = _builtinFunctions.get(_functionName);
 		try {
 			assert (m != null);
-			Object instance = null;
-			return (List<Tuple>) m.invoke(instance, data, _arguments);
+			return (List<Tuple>) m.invoke(this, data);
 		} catch (IllegalArgumentException e) {
 			// TODO Auto-generated catch block
 			System.err.println("Illegal argument exception: " + e.toString());
@@ -97,7 +89,12 @@ public class Function extends Value {
 		return null;
 	}
 	
+		
+	public Function(String name) {
+		super(Type.getFunctionType());
+		_functionName = name;
+	}
+	
 	public boolean isFunction() { return true; }
 	public String getName() { return _functionName; }
-	
 }

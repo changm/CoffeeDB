@@ -22,4 +22,8 @@ public class FunctionOperator extends Operator {
 		List<Tuple> data = _child.getData();
 		return _function.execute(data);
 	}
+	
+	public Function getFunction() {
+		return _function;
+	}
 }

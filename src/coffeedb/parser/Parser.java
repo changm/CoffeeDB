@@ -8,6 +8,8 @@ import coffeedb.QueryPlan;
 import coffeedb.Schema;
 import coffeedb.Tuple;
 import coffeedb.Value;
+import coffeedb.functions.AggregateFunction;
+import coffeedb.functions.FilterFunction;
 import coffeedb.functions.Function;
 import coffeedb.operators.*;
 import coffeedb.types.Type;
@@ -114,6 +116,7 @@ public class Parser {
 		eat (Token.WHERE);
 		ArrayList<String> columns = new ArrayList<String>();
 		ArrayList<String> values = new ArrayList<String>();
+		ArrayList<Predicate> predicates = new ArrayList<Predicate>();
 		
 		String column = getIdent();
 		eat(Token.IDENT);
@@ -128,7 +131,7 @@ public class Parser {
 			eat (Token.COMMA);
 			column = getIdent();
 			eat(Token.IDENT);
-			eat (Token.EQUALS);
+			parsePredicate(predicates);
 			value = getIdent();
 			eat(Token.IDENT);
 		
@@ -137,22 +140,28 @@ public class Parser {
 		}
 		
 		String functionName = "where";
-		assert (columns.size() == values.size());
-		String[] arguments = new String[(columns.size() * 2) + 1];
-		arguments[arguments.length -1] = Predicate.EQUALS.toString();
-		
-		for (int i = 0; i < columns.size(); i++) {
-			column = columns.get(i);
-			value = values.get(i);
-		
-			arguments[i] = column;
-			arguments[i+1] = value;
-		}
-		
-		Function whereFunction = new Function(functionName, arguments);
-		return new FilterOperator(null, whereFunction, Predicate.EQUALS);
+		Function whereFunction = new FilterFunction(functionName, columns, values, predicates);
+		return new FunctionOperator(whereFunction);
 	}
 
+	private void parsePredicate(ArrayList<Predicate> predicates) {
+		Predicate op = null;
+		switch (peek()) {
+		case EQUALS:
+			op = Predicate.EQUALS;
+			break;
+		case LESS:
+			op = Predicate.LESS;
+			break;
+		case GREATER:
+			op = Predicate.GREATER;
+			break;
+		default:
+			assert false : "Unknown predicate";
+		}
+		
+		predicates.add(op);
+	}
 
 	private Operator parseCreate() {
 		eat(Token.CREATE);
@@ -229,10 +238,12 @@ public class Parser {
 		eat(Token.LEFT_PAREN);
 		
 		assert (isToken(Token.IDENT));
-		String[] arguments = parseStrings();
+		String column = getIdent();
+		eat(Token.IDENT);
 		eat(Token.RIGHT_PAREN);
 		
-		Function function = new Function(functionName, arguments);
+		String groupBy = null;
+		Function function = new AggregateFunction(functionName, column, groupBy);
 		return new FunctionOperator(function);
 	}
 
@@ -250,7 +261,7 @@ public class Parser {
 		if (isToken(Token.GROUP)) {
 			eat(Token.GROUP);
 			eat(Token.BY);
-			parseGroupBy();
+			parseGroupBy(select);
 		}
 		
 		assert (tables.length == 1);
@@ -259,11 +270,19 @@ public class Parser {
 		return select;
 	}
 
-	private void parseGroupBy() {
-		assert false : "Not yet implemented";
+	private void parseGroupBy(Operator select) {
+		String groupBy= getIdent();
+		eat(Token.IDENT);
+		
+		// Only aggregates can have group by selectors
+		assert (select instanceof FunctionOperator);
+		FunctionOperator functionOp = (FunctionOperator) (select);
+		Function aggregateFunction = functionOp.getFunction();
+		AggregateFunction agg = (AggregateFunction) aggregateFunction;
+		agg.setGroupBy(groupBy);
 	}
 
-		// Parse String, Deliminated, By, Comma
+	// Parse String, Deliminated, By, Comma
 	private String[] parseStrings() {
 		ArrayList<String> strings = new ArrayList<String>();
 		String ident = getIdent();

@@ -64,6 +64,7 @@ public class Value {
 
 	public void setInt(int value) {
 		assert (_type.isInt());
+		_buffer.rewind();
 		_buffer.putInt(value);
 		_data = _buffer.array();
 	}
@@ -74,6 +75,7 @@ public class Value {
 	}
 	
 	public void setLong(long value) {
+		_buffer.rewind();
 		_buffer.putLong(value);
 		_data = _buffer.array();
 	}
@@ -192,5 +194,19 @@ public class Value {
 
 	public byte[] getData() {
 		return _data;
+	}
+	
+	public int aggHash() {
+		switch (_type.getEnum()) {
+		case STRING:
+			return dataToString().hashCode();
+		case INTEGER:
+			return toInt();
+		default:
+			assert (false);
+		}
+		
+		assert (false);
+		return 0;
 	}
 }

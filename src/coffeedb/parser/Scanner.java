@@ -33,6 +33,8 @@ public class Scanner {
 		_tokenNames.put(",", Token.COMMA);
 		_tokenNames.put(";", Token.SEMI_COLON);
 		_tokenNames.put("=", Token.EQUALS);
+		_tokenNames.put("<", Token.LESS);
+		_tokenNames.put(">", Token.GREATER);
 	}
 
 	private boolean isEOF() {

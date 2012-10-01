@@ -132,13 +132,11 @@ public class CoffeeDB {
 		
 		database.runQuery("create table test (a int, b int);");
 		database.runQuery("insert into test values (10, 20);");
-		database.runQuery("insert into test values (30, 20);");
+		database.runQuery("insert into test values (25, 20);");
+		database.runQuery("insert into test values (40, 10);");
 		database.runQuery("select * from test;");
-		database.runQuery("update test SET a = 50 where b = 20;"); 
-		database.runQuery("select * from test;");
-		database.runQuery("drop table test;");
-		
-		
+		System.out.println("Running aggregate");
+		database.runQuery("select sum(a) from test group by b;");
 		database.shutdown();
 	}
 
