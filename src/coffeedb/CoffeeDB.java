@@ -136,7 +136,22 @@ public class CoffeeDB {
 		database.runQuery("insert into test values (40, 10);");
 		database.runQuery("select * from test;");
 		System.out.println("Running aggregate");
+		database.runQuery("select min(a) from test;");
+		/*
+		System.out.println("Run sum with group");
 		database.runQuery("select sum(a) from test group by b;");
+		System.out.println("Running min");
+		database.runQuery("select min(a) from test group by b;");
+		
+		System.out.println("Running count");
+		database.runQuery("select count(a) from test group by b;");
+		
+		System.out.println("Running max");
+		database.runQuery("select max(a) from test group by b;");
+		
+		System.out.println("Running avg");
+		database.runQuery("select avg(a) from test group by b;");
+		*/
 		database.shutdown();
 	}
 

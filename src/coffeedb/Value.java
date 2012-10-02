@@ -33,6 +33,26 @@ public class Value {
 		toType(value);
 	}
 	
+	public Value(Type type, Object object) {
+		_type = type;
+		_buffer = ByteBuffer.allocate(_type.getSize());
+		
+		switch (type.getEnum()) {
+		case INTEGER:
+			setInt((Integer) object);
+			break;
+		case STRING:
+			setString((String) object);
+			break;
+		case DOUBLE:
+			setDouble((Double) object);
+			break;
+		default:
+			assert (false);
+			break;
+		}
+	}
+	
 	private void toType(String value) {
 		switch (_type.getEnum()) {
 		case BLOB:
