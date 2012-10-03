@@ -158,4 +158,23 @@ public class Schema {
 		addSchema(merged, right);
 		return merged;
 	}
+	
+	public String toString() {
+		StringBuffer sb = new StringBuffer();
+		
+		for (int i = 0; i < _columnNames.size(); i++) {
+			sb.append(_columnNames.get(i));
+			if (i != _columnNames.size() - 1) {
+				sb.append("  |  ");
+			}
+		}
+		
+		int length = sb.length();
+		sb.append("\n");
+		for (int i = 0; i < length; i++) {
+			sb.append("-");
+		}
+		
+		return sb.toString();
+	}
 }

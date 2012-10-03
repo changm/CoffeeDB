@@ -109,9 +109,11 @@ public class Tuple {
 
 	public String toString() {
 		StringBuffer sb = new StringBuffer();
-		for (Value v : _values) {
-			sb.append(v.toString());
-			sb.append(" ");
+		for (int i = 0; i < _values.length; i++) {
+			sb.append(_values[i].toString());
+			if (i != _values.length - 1) {
+				sb.append(" | ");
+			}
 		}
 		
 		return sb.toString();

@@ -38,7 +38,13 @@ public class CoffeeDB {
 	private void printResults(Transaction transaction) {
 		assert (transaction.didCommit());
 		List<Tuple> results = transaction.getResult();
+		boolean printSchema = true;
 		for (Tuple tuple : results) {
+			if (printSchema) {
+				System.out.println(tuple.getSchema());
+				printSchema = false;
+			}
+			
 			System.out.println(tuple);
 		}
 		
