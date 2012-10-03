@@ -112,6 +112,18 @@ public class CoffeeDB {
 		_config = config;
 	}
 	
+	public void runTests() {
+		runQuery("create table test (a int, b int);");
+		runQuery("insert into test values (10, 20);");
+		//runQuery("insert into test values (25, 20);");
+		//runQuery("insert into test values (40, 10);");
+		
+		runQuery("create table test2 (c int, d int);");
+		runQuery("insert into test2 values (20, 30);");
+		runQuery("select * from test2 join test;");
+		
+	}
+	
 	public Config getConfig() {
 		assert (_config != null);
 		return _config;
@@ -129,30 +141,7 @@ public class CoffeeDB {
 		Config config = parseConfig(args);
 		CoffeeDB database = CoffeeDB.getInstance();
 		database.setConfig(config);
-		
-		database.runQuery("create table test (a int, b int);");
-		database.runQuery("insert into test values (10, 20);");
-		database.runQuery("insert into test values (25, 20);");
-		database.runQuery("insert into test values (40, 10);");
-		database.runQuery("select * from test;");
-		System.out.println("Running aggregate");
-		database.runQuery("select min(a) from test;");
-		/*
-		System.out.println("Run sum with group");
-		database.runQuery("select sum(a) from test group by b;");
-		System.out.println("Running min");
-		database.runQuery("select min(a) from test group by b;");
-		
-		System.out.println("Running count");
-		database.runQuery("select count(a) from test group by b;");
-		
-		System.out.println("Running max");
-		database.runQuery("select max(a) from test group by b;");
-		
-		System.out.println("Running avg");
-		database.runQuery("select avg(a) from test group by b;");
-		*/
+		database.runTests();
 		database.shutdown();
 	}
-
 }

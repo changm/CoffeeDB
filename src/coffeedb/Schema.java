@@ -107,8 +107,16 @@ public class Schema {
 		return _columnNames.indexOf(columnName);
 	}
 	
+	public String getColumnName(int index) {
+		return _columnNames.get(index);
+	}
+	
 	public Type getColumnType(String columnName) {
 		return _columnTypes.get(getIndex(columnName));
+	}
+	
+	public Type getColumnType(int index) {
+		return _columnTypes.get(index);
 	}
 
 	private boolean equalSchema(Schema other) {
@@ -134,5 +142,20 @@ public class Schema {
 	
 	public boolean hasColumn(String columnName) {
 		return _columnNames.contains(columnName);
+	}
+	
+	private static void addSchema(Schema merged, Schema source) {
+		for (int i = 0; i < source.numberOfColumns(); i++) {
+			String leftColumn = source.getColumnName(i);
+			Type columnType = source.getColumnType(i);
+			merged.addColumn(leftColumn, columnType);
+		}
+	}
+	
+	public static Schema mergeSchemas(Schema left, Schema right) {
+		Schema merged = new Schema();
+		addSchema(merged, left);
+		addSchema(merged, right);
+		return merged;
 	}
 }

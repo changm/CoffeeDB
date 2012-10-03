@@ -51,6 +51,11 @@ public class Tuple {
 		createSchema(values);
 	}
 	
+	public Tuple (Object...objects){
+		_values = Value.createValueArray(objects);
+		createSchema(_values);
+	}
+	
 	private void createSchema(Value[] values) {
 		_schema = new Schema();
 		for (Value v : values) {
@@ -178,5 +183,20 @@ public class Tuple {
 			
 			_values[i] = columnValue;
 		}
+	}
+
+	public static Tuple merge(Tuple left, Tuple right) {
+		Schema leftSchema = left.getSchema();
+		Schema mergedSchema = Schema.mergeSchemas(left._schema, right._schema);
+		Tuple result = new Tuple(mergedSchema);
+		for (int i = 0; i < leftSchema.columnCount(); i++) {
+			result.setValue(i, left.getValue(i));
+		}
+		
+		for (int i = leftSchema.columnCount(); i < mergedSchema.columnCount(); i++) {
+			result.setValue(i, right.getValue(i - leftSchema.columnCount()));
+		}
+		
+		return result;
 	}
 }

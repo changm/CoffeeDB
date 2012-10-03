@@ -252,10 +252,13 @@ public class Parser {
 		
 		Operator select = parseSelectExpression();
 		eat(Token.FROM);
-		String[] tables = parseStrings();
+		Operator dataSource = parseFrom();
+		select.setChild(dataSource);
 		
 		if (isToken(Token.WHERE)) {
-			parseWhere();
+			Operator where = parseWhere();
+			where.setChild(select);
+			select = where;
 		}
 		
 		if (isToken(Token.GROUP)) {
@@ -264,10 +267,35 @@ public class Parser {
 			parseGroupBy(select);
 		}
 		
-		assert (tables.length == 1);
-		ScanOperator scan = new ScanOperator(tables[0]);
-		select.setChild(scan);
 		return select;
+	}
+	
+	private boolean isJoin() {
+		Token current = peek();
+		return (current == Token.COMMA) ||
+				(current == Token.JOIN);
+	}
+	
+	private void eatJoin() {
+		assert (isJoin());
+		eat(peek());
+	}
+
+	private Operator parseFrom() {
+		assert (isToken(Token.IDENT));
+		String table = getIdent();
+		eat(Token.IDENT);
+		Operator result = new ScanOperator(table);
+		
+		while (isJoin()) {
+			eatJoin();
+			String joinTable = getIdent();
+			eat (Token.IDENT);
+			Operator joinScan = new ScanOperator(joinTable);
+			result = new JoinOperator(result, joinScan);
+		}
+		
+		return result;
 	}
 
 	private void parseGroupBy(Operator select) {
@@ -282,22 +310,6 @@ public class Parser {
 		agg.setGroupBy(groupBy);
 	}
 
-	// Parse String, Deliminated, By, Comma
-	private String[] parseStrings() {
-		ArrayList<String> strings = new ArrayList<String>();
-		String ident = getIdent();
-		strings.add(ident);
-		eat(Token.IDENT);
-		
-		while (isToken(Token.COMMA)) {
-			eat(Token.COMMA);
-			ident = getIdent();
-			strings.add(ident);
-		}
-		
-		return strings.toArray(new String[strings.size()]);
-	}
-	
 	private String getIdent() {
 		assert (isToken(Token.IDENT));
 		return _scanner.getIdent();
