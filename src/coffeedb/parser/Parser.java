@@ -4,8 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import coffeedb.CoffeeDB;
+import coffeedb.ConstantValue;
 import coffeedb.QueryPlan;
 import coffeedb.Schema;
+import coffeedb.SymbolValue;
 import coffeedb.Tuple;
 import coffeedb.Value;
 import coffeedb.functions.AggregateFunction;
@@ -69,82 +71,115 @@ public class Parser {
 		assert (isToken(Token.IDENT));
 		String tableName = getIdent();
 		eat(Token.IDENT);
-		
+			
 		Operator set = parseSet(tableName);
 		
-		Operator whereOp = parseWhere();
 		ScanOperator scan = new ScanOperator(tableName);
-		whereOp.setChild(scan);
+		Operator whereOp = parseWhere(scan);
 		
 		set.setChild(whereOp);
 		return set;
 	}
 	
+	private boolean isQuote(Token token) {
+		return (token == Token.DOUBLE_QUOTE) ||
+				(token == Token.SINGLE_QUOTE);
+	}
+	
+	private Value parseLiteralString() {
+		assert isQuote(peek());
+		Token end = peek();
+		eat (peek());
+		StringBuffer buffer = new StringBuffer();
+		
+		while (!isToken(end)) {
+			buffer.append(getIdent());
+			eat(Token.IDENT);
+		}
+		
+		return new ConstantValue(Type.getStringType(), buffer.toString());
+	}
+	
+	private Value parseValue() {
+		Value result = null;
+		switch (peek()) {
+		case IDENT:
+			result = new SymbolValue(getIdent());
+			eat (Token.IDENT);
+			break;
+		case SINGLE_QUOTE:
+		case DOUBLE_QUOTE:
+			result = parseLiteralString();
+			break;
+		case NUMERIC:
+			result = getConstantNumber();
+			eat (Token.NUMERIC);
+			break;
+		default:
+			assert false : "Unknown token: " + peek();
+			break;
+		}
+		
+		assert (result != null);
+		return result;
+	}
+	
 	private Operator parseSet(String tableName) {
 		eat(Token.SET);
-		ArrayList<String> columns = new ArrayList<String>();
-		ArrayList<String> values = new ArrayList<String>();
+		ArrayList<Value> columns = new ArrayList<Value>();
+		ArrayList<Value> values = new ArrayList<Value>();
 		
-		String column = getIdent();
-		eat(Token.IDENT);
-		eat (Token.EQUALS);
-		String value = getIdent();
-		eat(Token.IDENT);
+		Value left = parseValue();
+		eat(Token.EQUALS);
+		Value right = parseValue();
 		
-		columns.add(column);
-		values.add(value);
+		columns.add(left);
+		values.add(right);
 		
 		while (isToken(Token.COMMA)) {
 			eat (Token.COMMA);
-			column = getIdent();
-			eat(Token.IDENT);
+			left = parseValue();
 			eat(Token.EQUALS);
-			value = getIdent();
-			eat(Token.IDENT);
+			right = parseValue();
 		
-			columns.add(column);
-			values.add(value);
+			columns.add(left);
+			values.add(right);
 		}
 		
-		Value[] valuesArray = convertIntoValues(tableName, values);
-		String[] columnsArray = new String[columns.size()];
+		Value[] columnsArray = new Value[columns.size()];
+		Value[] valuesArray = new Value[columns.size()];
+		
 		columns.toArray(columnsArray);
+		values.toArray(valuesArray);
 		return new SetOperator(columnsArray, valuesArray);
 	}
 
-	private Operator parseWhere() {
+	private Operator parseWhere(Operator source) {
 		eat (Token.WHERE);
-		ArrayList<String> columns = new ArrayList<String>();
-		ArrayList<String> values = new ArrayList<String>();
-		ArrayList<Predicate> predicates = new ArrayList<Predicate>();
 		
-		String column = getIdent();
-		eat(Token.IDENT);
-		eat (Token.EQUALS);
-		String value = getIdent();
-		eat(Token.IDENT);
+		Value left = parseValue();
+		Predicate op = parsePredicate();
+		Value right = parseValue();
 		
-		columns.add(column);
-		values.add(value);
+		String functionName = "where";
+		Function whereFunction = new FilterFunction(functionName, left,right, op);
+		Operator top = new FunctionOperator(whereFunction);
+		top.setChild(source);
 		
 		while (isToken(Token.COMMA)) {
 			eat (Token.COMMA);
-			column = getIdent();
-			eat(Token.IDENT);
-			parsePredicate(predicates);
-			value = getIdent();
-			eat(Token.IDENT);
-		
-			columns.add(column);
-			values.add(value);
+			left = parseValue();
+			op = parsePredicate(); 
+			right = parseValue();
+			
+			whereFunction = new FilterFunction(functionName, left,right, op);
+			top = new FunctionOperator(whereFunction);
 		}
 		
-		String functionName = "where";
-		Function whereFunction = new FilterFunction(functionName, columns, values, predicates);
-		return new FunctionOperator(whereFunction);
+		return top;
 	}
 
-	private void parsePredicate(ArrayList<Predicate> predicates) {
+	private Predicate parsePredicate() {
 		Predicate op = null;
 		switch (peek()) {
 		case EQUALS:
@@ -160,7 +195,8 @@ public class Parser {
 			assert false : "Unknown predicate";
 		}
 		
-		predicates.add(op);
+		eat (peek());
+		return op;
 	}
 
 	private Operator parseCreate() {
@@ -256,8 +292,7 @@ public class Parser {
 		select.setChild(dataSource);
 		
 		if (isToken(Token.WHERE)) {
-			Operator where = parseWhere();
-			where.setChild(select);
+			Operator where = parseWhere(select);
 			select = where;
 		}
 		
@@ -315,6 +350,11 @@ public class Parser {
 		return _scanner.getIdent();
 	}
 	
+	private Value getConstantNumber() {
+		assert (isToken(Token.NUMERIC));
+		return _scanner.getNumber();
+	}
+	
 	private boolean isToken(Token token) {
 		return peek() == token;
 	}
@@ -332,14 +372,16 @@ public class Parser {
 		eat(Token.INSERT);
 		eat(Token.INTO);
 		String tableName = getIdent();
+		
 		eat(Token.IDENT);
 		eat(Token.VALUES);
 		eat(Token.LEFT_PAREN);
 		
-		String[] values = parseValues();
+		Value[] values = parseValues();
 		
 		eat(Token.RIGHT_PAREN);
-		Tuple tuple = convertIntoTuple(tableName, values);
+		Schema tableSchema = CoffeeDB.catalog().getTable(tableName).getSchema();
+		Tuple tuple = new Tuple(tableSchema, values);
 		return new InsertOperator(tableName, tuple);
 	}
 	
@@ -369,19 +411,17 @@ public class Parser {
 		return new Tuple(tableSchema, values);
 	}
 
-	private String[] parseValues() {
-		ArrayList<String> strings =  new ArrayList<String>();
-		String value = getIdent();
-		strings.add(value);
-		eat(Token.IDENT);
+	private Value[] parseValues() {
+		ArrayList<Value> values =  new ArrayList<Value>();
+		Value value = parseValue();
+		values.add(value);
 		
 		while (isToken(Token.COMMA)) {
 			eat(Token.COMMA);
-			value = getIdent();
-			strings.add(value);
-			eat(Token.IDENT);
+			value = parseValue();
+			values.add(value);
 		}
 		
-		return strings.toArray(new String[strings.size()]);
+		return values.toArray(new Value[values.size()]);
 	}
 }

@@ -40,7 +40,6 @@ public class Schema {
 	}
 	
 	public void addColumn(String columnName, Type type) {
-		assert (columnName.length() > 0);
 		_columnNames.add(columnName);
 		_columnTypes.add(type);
 	}

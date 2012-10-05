@@ -31,6 +31,8 @@ public enum Token {
 	EQUALS,
 	LESS,
 	GREATER,
+	SINGLE_QUOTE,
+	DOUBLE_QUOTE,
 	
 	// Types
 	INT,
@@ -40,4 +42,5 @@ public enum Token {
 	LONG, 
 	DOUBLE,
 	EOF, 
+	NUMERIC, 
 };

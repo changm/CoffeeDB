@@ -229,4 +229,12 @@ public class Value {
 		assert (false);
 		return 0;
 	}
+	
+	public boolean isConstant() {
+		return false;
+	}
+	
+	public boolean isSymbol() {
+		return false;
+	}
 }

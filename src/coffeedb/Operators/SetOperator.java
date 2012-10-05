@@ -8,20 +8,23 @@ import coffeedb.Value;
 import coffeedb.types.Type;
 
 public class SetOperator extends Operator {
-	private String[] _columns;
+	private Value[] _columns;
 	private Value[] _values;
 	
-	public SetOperator(String[] columns, Value[] values) {
-		assert (columns.length == values.length);
-		_columns = columns;
-		_values = values;
+	public SetOperator(Value[] left, Value[] right) {
+		assert (left.length == right.length);
+		_columns = left;
+		_values = right;
 	}
 	
 	private void updateTuple(Tuple t) {
 		for (int i = 0; i < _columns.length; i++) {
-			String column = _columns[i];
+			Value column = _columns[i];
+			assert (column.isSymbol());
+			
+			String columnName = column.toString();
 			Value newValue = _values[i];
-			t.setValue(column, newValue);
+			t.setValue(columnName, newValue);
 		}
 	}
 	
@@ -40,7 +43,6 @@ public class SetOperator extends Operator {
 		for (Tuple t : data) {
 			updateTuple(t);
 		}
-		
 		
 		return getResultTuple(data);
 	}

@@ -125,8 +125,8 @@ public class CoffeeDB {
 		//runQuery("insert into test values (40, 10);");
 		
 		runQuery("create table test2 (c int, d int);");
-		runQuery("insert into test2 values (20, 30);");
-		runQuery("select * from test2 join test;");
+		runQuery("insert into test2 values (10, 30);");
+		runQuery("select * from test2, test where a = c;");
 		
 	}
 	
