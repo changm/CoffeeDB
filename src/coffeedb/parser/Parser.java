@@ -8,6 +8,7 @@ import coffeedb.ConstantValue;
 import coffeedb.QueryPlan;
 import coffeedb.Schema;
 import coffeedb.SymbolValue;
+import coffeedb.Table;
 import coffeedb.Tuple;
 import coffeedb.Value;
 import coffeedb.functions.AggregateFunction;
@@ -46,6 +47,9 @@ public class Parser {
 		case DROP:
 			operator = parseDrop();
 			break;
+		case DELETE:
+			operator = parseDelete();
+			break;
 		default:
 			assert (false);
 		}
@@ -58,6 +62,17 @@ public class Parser {
 		return plan;
 	}
 	
+	private Operator parseDelete() {
+		eat(Token.DELETE);
+		Operator tableScan = parseFrom();
+		assert (tableScan instanceof ScanOperator);
+		
+		
+		Table scanTable = ((ScanOperator) tableScan).getTable();
+		Operator where = parseWhere(tableScan);
+		return new DeleteOperator(where, scanTable);
+	}
+
 	private Operator parseDrop() {
 		eat(Token.DROP);
 		eat(Token.TABLE);
@@ -287,7 +302,6 @@ public class Parser {
 		eat(Token.SELECT);
 		
 		Operator select = parseSelectExpression();
-		eat(Token.FROM);
 		Operator dataSource = parseFrom();
 		select.setChild(dataSource);
 		
@@ -317,6 +331,7 @@ public class Parser {
 	}
 
 	private Operator parseFrom() {
+		eat (Token.FROM);
 		assert (isToken(Token.IDENT));
 		String table = getIdent();
 		eat(Token.IDENT);

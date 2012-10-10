@@ -28,4 +28,8 @@ public class ScanOperator extends Operator {
 	public List<Tuple> getData() {
 		return _table.getData();
 	}
+	
+	public Table getTable() {
+		return _table;
+	}
 }

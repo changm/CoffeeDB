@@ -121,13 +121,17 @@ public class CoffeeDB {
 	public void runTests() {
 		runQuery("create table test (a int, b int);");
 		runQuery("insert into test values (10, 20);");
-		//runQuery("insert into test values (25, 20);");
-		//runQuery("insert into test values (40, 10);");
-		
 		runQuery("create table test2 (c int, d int);");
 		runQuery("insert into test2 values (10, 30);");
 		runQuery("select * from test2, test where a = c;");
-		
+	}
+	
+	public void deleteTests() {
+		runQuery("create table test (a int, b int);");
+		runQuery("insert into test values (10, 20);");
+		runQuery("insert into test values (15, 30);");
+		runQuery("delete from test where b = 20;");
+		runQuery("select * from test;");
 	}
 	
 	public Config getConfig() {
@@ -147,7 +151,8 @@ public class CoffeeDB {
 		Config config = parseConfig(args);
 		CoffeeDB database = CoffeeDB.getInstance();
 		database.setConfig(config);
-		database.runTests();
+		//database.runTests();
+		database.deleteTests();
 		database.shutdown();
 	}
 }
