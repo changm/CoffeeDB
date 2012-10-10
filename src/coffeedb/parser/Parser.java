@@ -303,12 +303,12 @@ public class Parser {
 		
 		Operator select = parseSelectExpression();
 		Operator dataSource = parseFrom();
-		select.setChild(dataSource);
 		
 		if (isToken(Token.WHERE)) {
-			Operator where = parseWhere(select);
-			select = where;
+			dataSource = parseWhere(dataSource);
 		}
+		
+		select.setChild(dataSource);
 		
 		if (isToken(Token.GROUP)) {
 			eat(Token.GROUP);
