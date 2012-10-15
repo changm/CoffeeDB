@@ -124,6 +124,8 @@ public class Value {
 			assert (false);
 		case STRING:
 			return this.dataToString().equals(other.dataToString());
+		case DOUBLE:
+			return this.toDouble() == other.toDouble();
 		default:
 			assert (false);
 			break;
@@ -147,7 +149,7 @@ public class Value {
 		return values;
 	}
 
-	private static Value convertObject(Object value) {
+	public static Value convertObject(Object value) {
 		if (value instanceof Integer) {
 			return createInt((Integer) value);
 		} else if (value instanceof String) {

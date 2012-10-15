@@ -11,7 +11,10 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import coffeedb.CoffeeDB;
+import coffeedb.Schema;
 import coffeedb.Tuple;
+import coffeedb.Value;
+import coffeedb.types.Type;
 
 public class AggregateTests {
 
@@ -37,26 +40,18 @@ public class AggregateTests {
 	public void tearDown() throws Exception {
 	}
 	
+	private Tuple createGroupByResult(int aggregateValue, String aggregateFunction) {
+		return Tuple.createTupleAndSchema(aggregateValue, aggregateFunction);
+	}
+	
 	private void assertAggregate(List<Tuple> result, int value) {
 		assertTrue (result.size() == 1);
 		assertTrue (result.get(0).getValue(0).toInt() == value);
 	}
 	
-	private void assertDoubleAggregate(List<Tuple> result, double value) {
-		assertTrue(result.size() == 1);
-		assertTrue (result.get(0).getValue(1).toDouble() == value);
-	}
-	
-	private void assertAggregateGroupBy(List<Tuple> result, int firstValue, int secondValue, String function) {
-		assertTrue (result.size() == 2);
-		assertTrue (result.get(0).getValue(function).toInt() == firstValue);
-		assertTrue (result.get(1).getValue(function).toInt() == secondValue);
-	}
-	
-	private void assertDoubleAggregateGroupBy(List<Tuple> result, double firstValue, double secondValue, String function) {
-		assertTrue(result.size() == 2);
-		assertTrue (result.get(0).getValue(function).toDouble() == firstValue);
-		assertTrue (result.get(1).getValue(function).toDouble() == secondValue);
+	private void assertAggregateGroupBy(List<Tuple> result, Object...objects) {
+		List<Tuple> expected = Tuple.createList(objects);
+		TestUtil.tuplesExist(result, expected);
 	}
 	
 	@Test
@@ -91,41 +86,52 @@ public class AggregateTests {
 	public void avg() {
 		CoffeeDB database = CoffeeDB.getInstance();
 		List<Tuple> result = database.runQuery("select avg(a) from test;");
-		assertDoubleAggregate(result, 20);
+		Tuple expected = Tuple.createTupleAndSchema(20.0, "avg");
+		assertTrue(TestUtil.tupleExist(result, expected));
 	}
 	
 	@Test
 	public void avgGroupBy() {
 		CoffeeDB database = CoffeeDB.getInstance();
 		List<Tuple> result = database.runQuery("select avg(a) from test group by b;");
-		assertDoubleAggregateGroupBy(result, 30.0, 15, "avg");
+		Tuple first = Tuple.createTupleAndSchema(30.0, "avg");
+		Tuple second = Tuple.createTupleAndSchema(15.0, "avg");
+		assertAggregateGroupBy(result, first, second);
 	}
 	
 	@Test
 	public void sumGroupBy() {
 		CoffeeDB database = CoffeeDB.getInstance();
 		List<Tuple> result = database.runQuery("select sum(a) from test group by b;");
-		assertAggregateGroupBy(result, 30, 30, "sum");
+		Tuple first = createGroupByResult(30, "sum");
+		Tuple second = createGroupByResult(30, "sum");
+		assertAggregateGroupBy(result, first, second);
 	}
 	
 	@Test
 	public void countGroupBy() {
 		CoffeeDB database = CoffeeDB.getInstance();
 		List<Tuple> result = database.runQuery("select count(a) from test group by b;");
-		assertAggregateGroupBy(result, 2, 1, "count");
+		Tuple first = createGroupByResult(2, "count");
+		Tuple second = createGroupByResult(1, "count");
+		assertAggregateGroupBy(result, first, second);
 	}
 	
 	@Test
 	public void minGroupBy() {
 		CoffeeDB database = CoffeeDB.getInstance();
 		List<Tuple> result = database.runQuery("select min(a) from test group by b;");
-		assertAggregateGroupBy(result, 30, 10, "min");
+		Tuple first = createGroupByResult(30, "min");
+		Tuple second = createGroupByResult(10, "min");
+		assertAggregateGroupBy(result, first, second);
 	}
 	
 	@Test
 	public void maxGroupBy() {
 		CoffeeDB database = CoffeeDB.getInstance();
 		List<Tuple> result = database.runQuery("select max(a) from test group by b;");
-		assertAggregateGroupBy(result, 30, 20, "max");
+		Tuple first = createGroupByResult(20, "max");
+		Tuple second = createGroupByResult(30, "max");
+		assertAggregateGroupBy(result, first, second);
 	}
 }

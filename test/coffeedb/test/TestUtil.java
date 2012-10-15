@@ -1,5 +1,7 @@
 package coffeedb.test;
 
+import java.util.List;
+
 import coffeedb.*;
 
 import static org.junit.Assert.*;
@@ -63,7 +65,23 @@ public class TestUtil {
 	public static boolean tableExists(String tableName) {
 		return CoffeeDB.getInstance().getCatalog().tableExists(tableName);
 	}
-
+	
+	public static boolean tupleExist(List<Tuple> data, Tuple expected) {
+		for (Tuple t : data) {
+			if (t.equals(expected)) {
+				return true;
+			}
+		}
+		
+		return false;
+	}
+	
+	public static void tuplesExist(List<Tuple> data, List<Tuple> expected) {
+		for (Tuple t : expected) {
+			assertTrue(tupleExist(data, t));
+		}
+	}
+	
 	public static boolean tupleExists(String tableName, Tuple tuple) {
 		if (!tableExists(tableName))
 			return false;

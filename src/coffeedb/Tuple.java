@@ -201,4 +201,29 @@ public class Tuple {
 		
 		return result;
 	}
+	
+	/***
+	 * Assumed API
+	 * Value, Name, Value, Name, etc
+	 * @param objects
+	 * @return
+	 */
+	public static Tuple createTupleAndSchema(Object...objects) {
+		assert (objects.length % 2) == 0;
+		Schema schema = new Schema();
+		Tuple tuple = new Tuple(schema);
+		Value[] values = new Value[objects.length / 2];
+		
+		for (int i = 0; i < objects.length; i += 2) {
+			Value columnValue = Value.convertObject(objects[i]);
+			values[i] = columnValue;
+			assert (objects[i+1] instanceof String);
+			String columnName = (String) objects[i+1];
+			schema.addColumn(columnName, columnValue.getType());
+		}
+		
+		tuple._schema = schema;
+		tuple._values = values;
+		return tuple;
+	}
 }
