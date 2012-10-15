@@ -27,7 +27,7 @@ public class DeleteTest {
 	public void setUp() throws Exception {
 		CoffeeDB db = CoffeeDB.getInstance();
 		db.reset();
-		db.runQuery("create table test (a int, b int)");
+		db.runQuery("create table test (a int, b int);");
 		db.runQuery("insert into test values (10, 20);");
 		db.runQuery("insert into test values (15, 30);");
 	}

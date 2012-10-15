@@ -38,7 +38,7 @@ public class JoinTests {
 	@Test
 	public void basicJoin() {
 		CoffeeDB db = CoffeeDB.getInstance();
-		db.runQuery("create table test (a int)");
+		db.runQuery("create table test (a int);");
 		db.runQuery("create table test2 (b int);");
 		db.runQuery("insert into test values (10);");
 		db.runQuery("insert into test2 values (20);");

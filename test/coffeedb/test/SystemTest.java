@@ -38,7 +38,7 @@ public class SystemTest {
 		
 		String tableName = "test";
 		assertFalse(catalog.tableExists(tableName));
-		database.runQuery("create table test (a int, b int)");
+		database.runQuery("create table test (a int, b int);");
 		assertTrue(catalog.tableExists(tableName));
 		
 		
@@ -55,7 +55,7 @@ public class SystemTest {
 		CoffeeDB database = CoffeeDB.getInstance();
 		Catalog catalog = database.getCatalog();
 		String tableName = "test";
-		database.runQuery("create table test (a int, b int)");
+		database.runQuery("create table test (a int, b int);");
 		assertTrue(catalog.tableExists(tableName));
 		
 		database.reset();
