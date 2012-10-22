@@ -12,7 +12,6 @@ import coffeedb.Value;
  * @author masonchang
  */
 public class BtreeNode {
-	public static int BRANCH_FACTOR = 3;
 	private static int KEY_INDEX = 0;
 	
 	/***
@@ -34,15 +33,24 @@ public class BtreeNode {
 	}
 	
 	private boolean isConsistent() {
-		return _keys.size() == _children.size();
+		if (_keys.isEmpty()) {
+			return _children.isEmpty();
+		}
+		
+		boolean childRatio = _keys.size() == _children.size() - 1;
+		return childRatio && areKeysSorted();
 	}
 	
+	private boolean areKeysSorted() {
+		return true;
+	}
+
 	private boolean shouldSplit() {
-		return _children.size() >= BRANCH_FACTOR;
+		return _keys.size() > Btree.BRANCH_FACTOR;
 	}
 	
 	private boolean shouldMerge() {
-		return _children.size() <= (BRANCH_FACTOR / 2);
+		return _keys.size() <= (Btree.BRANCH_FACTOR / 2);
 	}
 	
 	protected void mergeNode() {
@@ -55,24 +63,46 @@ public class BtreeNode {
 	}
 	
 	protected int getSplitIndex() {
-		return _keys.size() / 2;
+		return (int) Math.ceil((double)_keys.size() / 2.0);
+	}
+	
+	// We actually always have key.size() == child.size() + 1
+	// Because of the artificial left index
+	// so a key that isn't the 0 key maps to a child of keyIndex + 1
+	private int getChildIndex(int keyIndex) {
+		return keyIndex + 1;
 	}
 	
 	protected void splitNode(BtreeNode right) {
 		int splitIndex = getSplitIndex();
 		Value splitKey = _keys.get(splitIndex);
-		_parent.addNode(splitKey, this, right);
 		right.setParent(_parent);
 		
-		for (int i = splitIndex; i < _children.size(); i++) {
-			Value key = _keys.get(i);
-			BtreeNode child = _children.get(i);
-			right.addKey(key, child);
+		transferValuesToRight(right, splitIndex);
+		removeTransferedValues(splitIndex);
+		addKeyToParent(right, splitKey);
+	}
+
+	private void addKeyToParent(BtreeNode right, Value splitKey) {
+		if (!_parent.isEmptyNode()) {
+			_parent.addKey(splitKey, right);
 		}
-		
-		for (int i = 0; i < _children.size(); i++) {
+	}
+
+	private void removeTransferedValues(int splitIndex) {
+		int keySize = _keys.size();
+		for (int i = splitIndex; i < keySize; i++) {
 			_keys.removeLast();
 			_children.removeLast();
+		}
+	}
+
+	private void transferValuesToRight(BtreeNode right, int splitIndex) {
+		for (int i = splitIndex; i < _keys.size(); i++) {
+			Value key = _keys.get(i);
+			int childIndex = getChildIndex(i);
+			BtreeNode child = _children.get(childIndex);
+			right.addKey(key, child);
 		}
 	}
 	
@@ -84,20 +114,46 @@ public class BtreeNode {
 		assert (isRoot());
 		BtreeNode newRoot = new BtreeNode();
 		BtreeNode right = new BtreeNode();
+		BtreeNode left = this;
 		
-		this.setParent(newRoot);
+		left.setParent(newRoot);
 		right.setParent(newRoot);
-		
 		splitNode(right);
+		newRoot.addNodes(right.getKey(), left, right);
+		
+		assert (isConsistent());
+		assert (right.isConsistent());
+		assert (newRoot.isConsistent());
 		return newRoot;
 	}
 	
 	public void deleteKey(Value key) {
 	}
 	
+	private int findKeyIndex(Value key) {
+		if (_keys.isEmpty()) return 0;
+		
+		if (_keys.size() == 1) {
+			Value firstKey = _keys.getFirst();
+			if (key.lessThan(firstKey)) return 0;
+		}
+		
+		for (int i = 0; i < _keys.size(); i++) {
+			Value currentKey =  _keys.get(i);
+			if (key.lessThan(currentKey)) return i;
+		}
+		
+		return _keys.size();
+	}
+	
 	public void addKey(Value key, BtreeNode child) {
-		_keys.add(key);
-		_children.add(child);
+		int index = findKeyIndex(key);
+		if (_children.isEmpty()) {
+			_children.add(child);
+		} else {
+			_keys.add(index, key);
+			_children.add(getChildIndex(index), child);
+		}
 		
 		if (shouldSplit()) {
 			if (isRoot()) {
@@ -108,15 +164,19 @@ public class BtreeNode {
 		}
 	}
 	
-	public void addNode(Value key, BtreeNode left, BtreeNode right) {
-		// If we're a new node, we have to start with a left/right children.
-		// But we actually only have one key. If an incoming value is less than the key, we go left
-		if (_children.isEmpty()) {
-			_children.add(left);
-		}
+	public boolean isEmptyNode() {
+		return (_keys.size() == 0) && (_children.size() == 0);
+	}
+	
+	public void addNodes(Value key, BtreeNode left, BtreeNode right) {
+		// We're a new node without any children
+		// We should add both the left and right child
+		assert (_keys.isEmpty());
+		assert (_children.isEmpty());
 		
-		_children.add(right);
 		_keys.add(key);
+		_children.add(left);
+		_children.add(right);
 	}
 	
 	public void searchKey(Value key) {
@@ -135,12 +195,13 @@ public class BtreeNode {
 		assert (!isLeaf());
 		assert (isConsistent());
 		
-		for (BtreeNode child : _children) {
-			if (child.getKey().equals(key)) return child;
+		for (int i = 0; i < _children.size(); i++) {
+			BtreeNode child = _children.get(i);
+			Value childKey = child.getKey();
+			if (key.lessThan(childKey)) return child;
 		}
 		
-		assert false : key.toString() + " is not in btreenode";
-		return null;
+		return _children.getLast();
 	}
 	
 	/***
@@ -169,5 +230,9 @@ public class BtreeNode {
 		
 		keys.append(" | ");
 		return keys.toString();
+	}
+	
+	public LinkedList<Value> getKeys() {
+		return _keys;
 	}
 }

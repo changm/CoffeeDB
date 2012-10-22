@@ -15,14 +15,37 @@ public class BtreeLeafNode extends BtreeNode {
 		_pointers = new LinkedList<Tuple>();
 	}
 	
-	private boolean isConsistent() {
+	public boolean isConsistent() {
 		boolean constraints = _pointers.size() == _keys.size();
-		constraints &= _pointers.size() <= BtreeNode.BRANCH_FACTOR;
-		return constraints;
+		constraints = constraints && (_pointers.size() <= Btree.BRANCH_FACTOR);
+		return constraints && pointersSorted() && keysMatchTuples();
 	}
 	
+	public boolean keysMatchTuples() {
+		for (int i = 0; i < _keys.size(); i++) {
+			Value key = _keys.get(i);
+			Tuple tuple = _pointers.get(i);
+			if (!key.equals(tuple.getValue(0))) return false;
+		}
+		
+		return true;
+	}
+	
+	public boolean pointersSorted() {
+		if (_keys.isEmpty()) return true;
+		Value prev = _keys.get(0);
+		
+		for (int i = 1; i < _pointers.size(); i++) {
+			Value key = _keys.get(i);
+			if (key.lessThan(prev)) return false;
+			prev = key;
+		}
+		
+		return true;
+	}
+
 	private boolean shouldSplit() {
-		return _keys.size() > BtreeNode.BRANCH_FACTOR;
+		return _keys.size() > Btree.BRANCH_FACTOR;
 	}
 	
 	private boolean shouldMerge() {
@@ -31,26 +54,37 @@ public class BtreeLeafNode extends BtreeNode {
 	}
 	
 	
-	protected void splitNode() {
+	protected void splitNode(BtreeLeafNode right) {
 		int split = getSplitIndex();
-		BtreeLeafNode right = new BtreeLeafNode();
 		right.setParent(_parent);
-		addLinkToNextLeaf(right);
 		
+		addLinkToNextLeaf(right);
+		transferValuesToRightNode(right, split);
+		removeTransferedValues(split);
+		addKeyToParent(right);
+	}
+
+	private void addKeyToParent(BtreeLeafNode right) {
+		if (!_parent.isEmptyNode()) {
+			_parent.addKey(right.getKey(), right);
+		}
+	}
+
+	private void removeTransferedValues(int split) {
+		while (_pointers.size() > split) {
+			_pointers.removeLast();
+			_keys.removeLast();
+		}
+	}
+
+	private void transferValuesToRightNode(BtreeLeafNode right, int split) {
 		for (int i = split; i < _pointers.size(); i++) {
 			Value key = _keys.get(i);
 			Tuple pointer = _pointers.get(i);
 			right.addKey(key, pointer);
 		}
-		
-		while (_pointers.size() > split) {
-			_pointers.removeLast();
-			_keys.removeLast();
-		}
-		
-		_parent.addNode(right.getKey(), this, right);
 	}
-
+	
 	private void addLinkToNextLeaf(BtreeLeafNode next) {
 		this._next = next;
 	}
@@ -58,8 +92,11 @@ public class BtreeLeafNode extends BtreeNode {
 	protected BtreeNode splitRootNode() {
 		assert (isRoot());
 		BtreeNode root =  new BtreeNode();
+		BtreeLeafNode right = new BtreeLeafNode();
 		this.setParent(root);
-		splitNode();
+		
+		splitNode(right);
+		root.addNodes(right.getKey(), this, right);
 		return root;
 	}
 
@@ -67,7 +104,7 @@ public class BtreeLeafNode extends BtreeNode {
 		assert false : "Haven't implemented split node";
 	}
 	
-	private int getIndex(Value key) {
+	private int getInsertIndex(Value key) {
 		assert (isConsistent());
 		if (_keys.isEmpty()) return 0;
 		
@@ -89,8 +126,12 @@ public class BtreeLeafNode extends BtreeNode {
 		return nextIndex;
 	}
 	
+	private int findIndex(Value key) {
+		return _keys.indexOf(key);
+	}
+	
 	public void addKey(Value key, Tuple tuple) {
-		int index = getIndex(key);
+		int index = getInsertIndex(key);
 		_keys.add(index, key);
 		_pointers.add(index, tuple);
 		
@@ -104,9 +145,14 @@ public class BtreeLeafNode extends BtreeNode {
 			if (isRoot()) {
 				splitRootNode();
 			} else {
-				splitNode();
+				splitNode(new BtreeLeafNode());
 			}
 		}
+	}
+	
+	public Tuple getTuple(Value key) {
+		int index = findIndex(key);
+		return _pointers.get(index);
 	}
 	
 	public void deleteKey(Value key) {
@@ -139,4 +185,7 @@ public class BtreeLeafNode extends BtreeNode {
 		return sb.toString();
 	}
 	
+	public LinkedList<Tuple> getTuples() {
+		return _pointers;
+	}
 }

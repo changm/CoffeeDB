@@ -104,10 +104,14 @@ public class Value {
 		return compare(Predicate.LESS, other);
 	}
 	
+	public boolean greaterThan(Value other) {
+		return compare(Predicate.GREATER, other);
+	}
+	
 	public boolean compare(Predicate predicate, Value other) {
 		switch (predicate) {
 		case LESS:
-			return !greaterThan(this, other);
+			return !greaterEqualThan(this, other);
 		case EQUALS:
 			return this.equals(other);
 		case GREATER:
@@ -143,6 +147,11 @@ public class Value {
 	private boolean greaterThan(Value value, Value other) {
 		assert (value.getType().equals(other.getType()));
 		return value.toInt() > other.toInt();
+	}
+	
+	private boolean greaterEqualThan(Value value, Value other) {
+		assert (value.getType().equals(other.getType()));
+		return value.toInt() >= other.toInt();
 	}
 
 	public static Value[] createValueArray(Object...objects) {

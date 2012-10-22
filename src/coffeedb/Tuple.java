@@ -216,9 +216,11 @@ public class Tuple {
 		
 		for (int i = 0; i < objects.length; i += 2) {
 			Value columnValue = Value.convertObject(objects[i]);
-			values[i] = columnValue;
 			assert (objects[i+1] instanceof String);
 			String columnName = (String) objects[i+1];
+			
+			int valueIndex = i / 2;
+			values[valueIndex] = columnValue;
 			schema.addColumn(columnName, columnValue.getType());
 		}
 		

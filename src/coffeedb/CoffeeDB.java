@@ -161,8 +161,10 @@ public class CoffeeDB {
 
 	private void btreeTests() {
 		Btree btree = new Btree();
+		// Want to choose a value such that the internal node also splits.
+		int totalRecords = (Btree.BRANCH_FACTOR * 3) + 1;
 		
-		for (int i = 0; i <= BtreeNode.BRANCH_FACTOR; i++) {
+		for (int i = 0; i <= totalRecords; i++) {
 			Tuple tuple = new Tuple(i, "test" + i);
 			Value key = tuple.getValue(0);
 			btree.addKey(key, tuple);

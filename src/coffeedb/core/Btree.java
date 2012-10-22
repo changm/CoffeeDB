@@ -1,12 +1,14 @@
 package coffeedb.core;
 
 import java.util.LinkedList;
+import java.util.Queue;
 
 import coffeedb.Tuple;
 import coffeedb.Value;
 
 public class Btree {
 	private BtreeNode _root;
+	public static int BRANCH_FACTOR = 3;
 	
 	public Btree() {
 		_root = new BtreeLeafNode();
@@ -45,14 +47,37 @@ public class Btree {
 			
 			if (level.isEmpty()) {
 				buffer.append("\n");
-				level = alt;
+				level.addAll(alt); 
+				alt.clear();
 			}
 		}
 		
 		return buffer.toString();
 	}
 	
+	public BtreeLeafNode findLeaf(Value key) {
+		return findBucket(_root, key);
+	}
+	
 	public String toString() {
 		return printBFS();
+	}
+	
+	public int getTreeSize() {
+		int count = 0;
+		LinkedList<BtreeNode> queue = new LinkedList<BtreeNode>();
+		queue.add(_root);
+		
+		while (!queue.isEmpty()) {
+			count++;
+			BtreeNode node = queue.removeFirst();
+			queue.addAll(node.getChildren());
+		}
+		
+		return count;
+	}
+	
+	public BtreeNode getRoot() {
+		return _root;
 	}
 }
