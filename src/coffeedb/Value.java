@@ -100,12 +100,18 @@ public class Value {
 		_data = _buffer.array();
 	}
 	
+	public boolean lessThan(Value other) {
+		return compare(Predicate.LESS, other);
+	}
+	
 	public boolean compare(Predicate predicate, Value other) {
 		switch (predicate) {
 		case LESS:
 			return !greaterThan(this, other);
 		case EQUALS:
 			return this.equals(other);
+		case GREATER:
+			return greaterThan(this, other);
 		default:
 			assert (false);
 			return false;
@@ -136,7 +142,7 @@ public class Value {
 
 	private boolean greaterThan(Value value, Value other) {
 		assert (value.getType().equals(other.getType()));
-		return value.toInt() < other.toInt();
+		return value.toInt() > other.toInt();
 	}
 
 	public static Value[] createValueArray(Object...objects) {

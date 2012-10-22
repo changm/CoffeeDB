@@ -2,6 +2,8 @@ package coffeedb;
 
 import java.util.List;
 
+import coffeedb.core.Btree;
+import coffeedb.core.BtreeNode;
 import coffeedb.parser.Parser;
 
 public class CoffeeDB {
@@ -151,8 +153,21 @@ public class CoffeeDB {
 		Config config = parseConfig(args);
 		CoffeeDB database = CoffeeDB.getInstance();
 		database.setConfig(config);
+		database.btreeTests();
 		//database.runTests();
-		database.deleteTests();
+		//database.deleteTests();
 		database.shutdown();
+	}
+
+	private void btreeTests() {
+		Btree btree = new Btree();
+		
+		for (int i = 0; i <= BtreeNode.BRANCH_FACTOR; i++) {
+			Tuple tuple = new Tuple(i, "test" + i);
+			Value key = tuple.getValue(0);
+			btree.addKey(key, tuple);
+		}
+		
+		System.out.println(btree.toString());
 	}
 }
