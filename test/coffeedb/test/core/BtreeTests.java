@@ -38,9 +38,23 @@ public class BtreeTests {
 	public void tearDown() throws Exception {
 	}
 	
-	private boolean leavesHaveTuplesInOrder(List<Tuple> tuples) {
-		assert (false);
-		return false;
+	private void leavesHaveTuplesInOrder(List<Tuple> tuples) {
+		assert (!tuples.isEmpty());
+		Tuple first = tuples.get(0);
+		Value firstKey = first.getValue(0);
+		
+		BtreeLeafNode bucket = _instance.findLeaf(firstKey);
+		for (int i = 0; i < tuples.size(); i++) {
+			if (((i % Btree.BRANCH_FACTOR) == 0) && (i != 0)) {
+				if (bucket.hasNextLeaf()) {
+					bucket = bucket.getNextLeaf();
+					assert (bucket != null);
+				}
+			}
+			
+			Tuple tuple = tuples.get(i);
+			assertTrue(bucket.containsTuple(tuple));
+		}
 	}
 	
 	private void tuplesExist(List<Tuple> tuples) {
@@ -117,8 +131,13 @@ public class BtreeTests {
 	@Test
 	public void variedValueTest() {
 		int records[] = {44, 53, 86, 4, 53, 23};
+		int sortedRecords[] = {4, 23, 44, 53, 53, 86};
+		
 		List<Tuple> insertedTuples = insertTuples(records);
 		tuplesExist(insertedTuples);
+		
+		List<Tuple> sortedTuples = createTuples(sortedRecords);
+		leavesHaveTuplesInOrder(sortedTuples);
 	}
 	
 	@Test

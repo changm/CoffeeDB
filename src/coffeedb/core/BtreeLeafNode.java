@@ -196,4 +196,12 @@ public class BtreeLeafNode extends BtreeNode {
 		
 		return false;
 	}
+
+	public boolean hasNextLeaf() {
+		return _next != null;
+	}
+	
+	public BtreeLeafNode getNextLeaf() {
+		return _next;
+	}
 }
