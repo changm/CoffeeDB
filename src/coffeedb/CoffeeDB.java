@@ -1,6 +1,7 @@
 package coffeedb;
 
 import java.util.List;
+import java.util.Random;
 
 import coffeedb.core.Btree;
 import coffeedb.core.BtreeNode;
@@ -162,10 +163,16 @@ public class CoffeeDB {
 	private void btreeTests() {
 		Btree btree = new Btree();
 		// Want to choose a value such that the internal node also splits.
-		int totalRecords = (Btree.BRANCH_FACTOR * 3) + 1;
+		int totalRecords = (Btree.BRANCH_FACTOR * 2) + 1;
+		Random random = new Random();
+		//int records[] = {44, 53, 86, 4, 53, 23};
+		int records[] = {39, 39};
 		
-		for (int i = 0; i <= totalRecords; i++) {
-			Tuple tuple = new Tuple(i, "test" + i);
+		for (int i = 0; i < records.length; i++) {
+			//int tupleValue = random.nextInt(100);
+			int tupleValue = records[i];
+			System.out.println("Inserting value: " + tupleValue);
+			Tuple tuple = new Tuple(tupleValue, "test" + tupleValue);
 			Value key = tuple.getValue(0);
 			btree.addKey(key, tuple);
 		}

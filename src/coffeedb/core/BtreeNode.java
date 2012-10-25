@@ -198,7 +198,15 @@ public class BtreeNode {
 		for (int i = 0; i < _children.size(); i++) {
 			BtreeNode child = _children.get(i);
 			Value childKey = child.getKey();
-			if (key.lessThan(childKey)) return child;
+			
+			if (key.lessThan(childKey)) {
+				if (i == 0) {
+					return child;
+				} else {
+					// Because we have to go left
+					return _children.get(i - 1);
+				}
+			}
 		}
 		
 		return _children.getLast();

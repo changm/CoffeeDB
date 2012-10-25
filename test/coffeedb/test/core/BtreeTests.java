@@ -4,6 +4,7 @@ import static org.junit.Assert.*;
 
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.List;
 
 import org.junit.After;
 import org.junit.AfterClass;
@@ -27,7 +28,7 @@ public class BtreeTests {
 	@AfterClass
 	public static void tearDownAfterClass() throws Exception {
 	}
-
+	
 	@Before
 	public void setUp() throws Exception {
 		_instance = new Btree();
@@ -35,6 +36,19 @@ public class BtreeTests {
 
 	@After
 	public void tearDown() throws Exception {
+	}
+	
+	private boolean leavesHaveTuplesInOrder(List<Tuple> tuples) {
+		assert (false);
+		return false;
+	}
+	
+	private void tuplesExist(List<Tuple> tuples) {
+		for (Tuple t : tuples) {
+			Value key = t.getValue(0);
+			BtreeLeafNode bucket = _instance.findLeaf(key);
+			assertTrue(bucket.containsTuple(t));
+		}
 	}
 
 	@Test
@@ -74,6 +88,44 @@ public class BtreeTests {
 			}
 						
 		} // end outer for
+	}
+	
+	private List<Tuple> createTuples(int[] records) {
+		LinkedList<Tuple> tuples = new LinkedList<Tuple>();
+		for (int i = 0; i < records.length; i++) {
+			int intColumn = records[i];
+			Tuple tuple = Tuple.createTupleAndSchema(intColumn, "test" + intColumn);
+			tuples.add(tuple);
+		}
+		
+		return tuples;
+	}
+	
+	private void insertTuples(List<Tuple> tuples) {
+		for (Tuple t : tuples) {
+			Value key = t.getValue(0);
+			_instance.addKey(key, t);
+		}
+	}
+	
+	private List<Tuple> insertTuples(int[] keys) {
+		List<Tuple> tuples = createTuples(keys);
+		insertTuples(tuples);
+		return tuples;
+	}
+	
+	@Test
+	public void variedValueTest() {
+		int records[] = {44, 53, 86, 4, 53, 23};
+		List<Tuple> insertedTuples = insertTuples(records);
+		tuplesExist(insertedTuples);
+	}
+	
+	@Test
+	public void duplicateInsertTest() {
+		int records[] = {39, 39};
+		List<Tuple> insertedTuples = insertTuples(records);
+		tuplesExist(insertedTuples);
 	}
 
 }

@@ -116,6 +116,8 @@ public class Value {
 			return this.equals(other);
 		case GREATER:
 			return greaterThan(this, other);
+		case GREATER_OR_EQ:
+			return greaterEqualThan(this, other);
 		default:
 			assert (false);
 			return false;

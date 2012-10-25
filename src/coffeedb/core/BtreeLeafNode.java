@@ -122,7 +122,7 @@ public class BtreeLeafNode extends BtreeNode {
 		
 		int nextIndex = _pointers.size();
 		Value greatest = _keys.get(nextIndex - 1);
-		assert (key.compare(Predicate.GREATER, greatest));
+		assert (key.compare(Predicate.GREATER_OR_EQ, greatest));
 		return nextIndex;
 	}
 	
@@ -187,5 +187,13 @@ public class BtreeLeafNode extends BtreeNode {
 	
 	public LinkedList<Tuple> getTuples() {
 		return _pointers;
+	}
+	
+	public boolean containsTuple(Tuple tuple) {
+		for (Tuple bucketTuple : _pointers) {
+			if (bucketTuple.equals(tuple)) return true;
+		}
+		
+		return false;
 	}
 }
