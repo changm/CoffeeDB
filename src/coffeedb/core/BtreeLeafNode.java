@@ -8,200 +8,150 @@ import coffeedb.Value;
 import coffeedb.operators.Predicate;
 
 public class BtreeLeafNode extends BtreeNode {
-	private LinkedList<Tuple> _pointers;
+	private LinkedList<Value> _keys;
+	private LinkedList<Tuple> _tuples;
+	private int _branchFactor;
+	private static int KEY_INDEX = 0;
 	private BtreeLeafNode _next;
+	
+	public BtreeLeafNode (BtreeInternalNode parent, int branchFactor) {
+		setParent(parent);
+		_keys = new LinkedList<Value>();
+		_tuples = new LinkedList<Tuple>();
+		_branchFactor = branchFactor;
+	}
+	
+	private int findNewSlot(Value key) {
+		if (isEmpty()) return 0;
+		if (key.lessThan(_keys.getFirst())) return 0;
 		
-	public BtreeLeafNode() {
-		_pointers = new LinkedList<Tuple>();
-	}
-	
-	public boolean isConsistent() {
-		boolean constraints = _pointers.size() == _keys.size();
-		constraints = constraints && (_pointers.size() <= Btree.BRANCH_FACTOR);
-		return constraints && pointersSorted() && keysMatchTuples();
-	}
-	
-	public boolean keysMatchTuples() {
-		for (int i = 0; i < _keys.size(); i++) {
-			Value key = _keys.get(i);
-			Tuple tuple = _pointers.get(i);
-			if (!key.equals(tuple.getValue(0))) return false;
-		}
-		
-		return true;
-	}
-	
-	public boolean pointersSorted() {
-		if (_keys.isEmpty()) return true;
-		Value prev = _keys.get(0);
-		
-		for (int i = 1; i < _pointers.size(); i++) {
-			Value key = _keys.get(i);
-			if (key.lessThan(prev)) return false;
-			prev = key;
-		}
-		
-		return true;
-	}
-
-	private boolean shouldSplit() {
-		return _keys.size() > Btree.BRANCH_FACTOR;
-	}
-	
-	private boolean shouldMerge() {
-		assert (isConsistent());
-		return _keys.size() < getSplitIndex();
-	}
-	
-	
-	protected void splitNode(BtreeLeafNode right) {
-		int split = getSplitIndex();
-		right.setParent(_parent);
-		
-		addLinkToNextLeaf(right);
-		transferValuesToRightNode(right, split);
-		removeTransferedValues(split);
-		addKeyToParent(right);
-	}
-
-	private void addKeyToParent(BtreeLeafNode right) {
-		if (!_parent.isEmptyNode()) {
-			_parent.addKey(right.getKey(), right);
-		}
-	}
-
-	private void removeTransferedValues(int split) {
-		while (_pointers.size() > split) {
-			_pointers.removeLast();
-			_keys.removeLast();
-		}
-	}
-
-	private void transferValuesToRightNode(BtreeLeafNode right, int split) {
-		for (int i = split; i < _pointers.size(); i++) {
-			Value key = _keys.get(i);
-			Tuple pointer = _pointers.get(i);
-			right.addKey(key, pointer);
-		}
-	}
-	
-	private void addLinkToNextLeaf(BtreeLeafNode next) {
-		this._next = next;
-	}
-	
-	protected BtreeNode splitRootNode() {
-		assert (isRoot());
-		BtreeNode root =  new BtreeNode();
-		BtreeLeafNode right = new BtreeLeafNode();
-		this.setParent(root);
-		
-		splitNode(right);
-		root.addNodes(right.getKey(), this, right);
-		return root;
-	}
-
-	protected void mergeNode() {
-		assert false : "Haven't implemented split node";
-	}
-	
-	private int getInsertIndex(Value key) {
-		assert (isConsistent());
-		if (_keys.isEmpty()) return 0;
-		
-		Value first = _keys.get(0);
-		if (key.compare(Predicate.LESS, first)) {
-			return 0;
-		}
-		
-		for (int i = 0; i < _pointers.size(); i++) {
-			Value compare = _keys.get(i);
-			if (key.compare(Predicate.LESS, compare)) {
-				return i;
+		for (int i = 1; i < _keys.size(); i++) {
+			Value slotKey = _keys.get(i);
+			if (key.lessThan(slotKey)) {
+				return i; 
 			}
 		}
 		
-		int nextIndex = _pointers.size();
-		Value greatest = _keys.get(nextIndex - 1);
-		assert (key.compare(Predicate.GREATER_OR_EQ, greatest));
-		return nextIndex;
+		return _keys.size();
 	}
 	
-	private int findIndex(Value key) {
-		return _keys.indexOf(key);
+	private int findKeySlot(Value key) {
+		for (int i = 0; i < _keys.size(); i++) {
+			Value slotKey = _keys.get(i);
+			if (slotKey.equals(key)) return i;
+		}
+		
+		assert false : "Unknown key in leaf node " + key;
+		return -1;
 	}
 	
 	public void addKey(Value key, Tuple tuple) {
-		int index = getInsertIndex(key);
-		_keys.add(index, key);
-		_pointers.add(index, tuple);
-		
-		/***
-		 * We don't split until we already add the key. 
-		 * Simplifies the logic when we split so that we don't
-		 * have to find which leaf node we should have inserted the new value
-		 * into
-		 */
-		if (shouldSplit()) {
-			if (isRoot()) {
-				splitRootNode();
-			} else {
-				splitNode(new BtreeLeafNode());
-			}
-		}
-	}
-	
-	public Tuple getTuple(Value key) {
-		int index = findIndex(key);
-		return _pointers.get(index);
+		int slot = findNewSlot(key);
+		_keys.add(slot, key);
+		_tuples.add(slot, tuple);
+		assert (isConsistent());
 	}
 	
 	public void deleteKey(Value key) {
+		int slot = findKeySlot(key);
+		_keys.remove(slot);
+		_tuples.remove(slot);
 		assert (isConsistent());
-		assert (_keys.contains(key));
-		
-		int index = _keys.indexOf(key);
-		_keys.remove(index);
-		_pointers.remove(index);
-		
-		if (shouldMerge()) {
-			mergeNode();
+	}
+	
+	public Tuple getTuple(Value key) {
+		int slot = findKeySlot(key);
+		return _tuples.get(slot);
+	}
+	
+	@Override
+	public boolean needsSplit() {
+		return _keys.size() > _branchFactor;
+	}
+
+	@Override
+	public boolean needsMerge() {
+		int half = (int) Math.ceil(_branchFactor / 2.0);
+		return _keys.size() < half;
+	}
+
+	@Override
+	public BtreeNode getLeftSibling() {
+		return getParent().getLeftSibling(this);
+	}
+
+	@Override
+	public BtreeNode getRightSibling() {
+		return getParent().getRightSibling(this);
+	}
+
+	@Override
+	public Value getKey() {
+		return _keys.get(KEY_INDEX);
+	}
+	
+	private boolean isSorted() {
+		if (isEmpty()) return true;
+		Value key = _keys.getFirst();
+		for (int i = 1; i < _keys.size(); i++) {
+			Value currentKey = _keys.get(i);
+			if (currentKey.lessThan(key)) return false;
+			key = currentKey;
 		}
+		
+		return true;
+	}
+
+	@Override
+	public boolean isConsistent() {
+		return (_keys.size() == _tuples.size()) && isSorted();
+	}
+
+	@Override
+	public boolean isEmpty() {
+		if (_keys.isEmpty()) {
+			return _tuples.isEmpty();
+		}
+		
+		return false;
+	}
+
+	public BtreeLeafNode getNext() {
+		return _next;
+	}
+
+	public void setNext(BtreeLeafNode next) {
+		this._next = next;
 	}
 	
 	public boolean isLeaf() {
 		return true;
 	}
 	
-	public String toString() {
-		assert (isConsistent());
-		StringBuffer sb = new StringBuffer();
-		for (int i = 0; i < _keys.size(); i++) {
-			Value key = _keys.get(i);
-			Tuple tuple = _pointers.get(i);
-			sb.append(key.toString() + " = [" + tuple.toString() + "] ");
-		}
-		
-		sb.append(" | ");
-		return sb.toString();
+	public LinkedList<Value> getKeys() {
+		return _keys;
 	}
 	
 	public LinkedList<Tuple> getTuples() {
-		return _pointers;
+		return _tuples;
 	}
 	
-	public boolean containsTuple(Tuple tuple) {
-		for (Tuple bucketTuple : _pointers) {
-			if (bucketTuple.equals(tuple)) return true;
+	public String toString() {
+		StringBuffer buffer = new StringBuffer();
+		for (Tuple tuple : _tuples) {
+			buffer.append(tuple);
+			buffer.append(",");
 		}
 		
-		return false;
-	}
-
-	public boolean hasNextLeaf() {
-		return _next != null;
+		return buffer.toString();
 	}
 	
-	public BtreeLeafNode getNextLeaf() {
-		return _next;
+	public void clean() {
+		_keys.clear();
+		_tuples.clear();
+	}
+	
+	public Value getTupleKey(Tuple tuple) {
+		return tuple.getValue(KEY_INDEX);
 	}
 }

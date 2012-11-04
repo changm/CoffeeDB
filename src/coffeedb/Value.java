@@ -256,4 +256,8 @@ public class Value {
 	public boolean isSymbol() {
 		return false;
 	}
+
+	public boolean greaterEqThan(Value other) {
+		return this.compare(Predicate.GREATER_OR_EQ, other);
+	}
 }

@@ -161,22 +161,22 @@ public class CoffeeDB {
 	}
 
 	private void btreeTests() {
-		Btree btree = new Btree();
-		// Want to choose a value such that the internal node also splits.
-		int totalRecords = (Btree.BRANCH_FACTOR * 2) + 1;
-		Random random = new Random();
-		//int records[] = {44, 53, 86, 4, 53, 23};
-		int records[] = {39, 39};
-		
-		for (int i = 0; i < records.length; i++) {
-			//int tupleValue = random.nextInt(100);
-			int tupleValue = records[i];
-			System.out.println("Inserting value: " + tupleValue);
-			Tuple tuple = new Tuple(tupleValue, "test" + tupleValue);
-			Value key = tuple.getValue(0);
-			btree.addKey(key, tuple);
+		Btree btree = new Btree(3);
+		int itemCount = 4;
+		for (int i = 0; i < itemCount; i++) {
+			Tuple tuple = Tuple.createTupleAndSchema(i, "test");
+			btree.addKey(tuple.getValue(0), tuple);
 		}
 		
+		System.out.println(btree.toString());
+		
+		for (int i = 0; i < 1; i++) {
+			Tuple tuple = Tuple.createTupleAndSchema(i, "test");
+			System.out.println("Deleting tuple: " + tuple);
+			btree.deleteKey(tuple.getValue(0));
+		}
+		
+		System.out.println("New tree:");
 		System.out.println(btree.toString());
 	}
 }

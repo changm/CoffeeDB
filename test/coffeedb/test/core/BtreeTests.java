@@ -31,13 +31,13 @@ public class BtreeTests {
 	
 	@Before
 	public void setUp() throws Exception {
-		_instance = new Btree();
+		_instance = new Btree(3);
 	}
 
 	@After
 	public void tearDown() throws Exception {
 	}
-	
+	/*
 	private void leavesHaveTuplesInOrder(List<Tuple> tuples) {
 		assert (!tuples.isEmpty());
 		Tuple first = tuples.get(0);
@@ -57,12 +57,15 @@ public class BtreeTests {
 		}
 	}
 	
-	private void tuplesExist(List<Tuple> tuples) {
+	/*
+	private boolean tuplesExist(List<Tuple> tuples) {
 		for (Tuple t : tuples) {
 			Value key = t.getValue(0);
 			BtreeLeafNode bucket = _instance.findLeaf(key);
-			assertTrue(bucket.containsTuple(t));
+			if (!bucket.containsTuple(t)) return false;
 		}
+		
+		return true;
 	}
 
 	@Test
@@ -128,13 +131,20 @@ public class BtreeTests {
 		return tuples;
 	}
 	
+	private void deleteTuples(List<Tuple> tuples) {
+		for (Tuple tuple : tuples) {
+			Value key = tuple.getValue(0);
+			_instance.deleteKey(key);
+		}
+	}
+	
 	@Test
 	public void variedValueTest() {
 		int records[] = {44, 53, 86, 4, 53, 23};
 		int sortedRecords[] = {4, 23, 44, 53, 53, 86};
 		
 		List<Tuple> insertedTuples = insertTuples(records);
-		tuplesExist(insertedTuples);
+		assertTrue(tuplesExist(insertedTuples));
 		
 		List<Tuple> sortedTuples = createTuples(sortedRecords);
 		leavesHaveTuplesInOrder(sortedTuples);
@@ -144,7 +154,17 @@ public class BtreeTests {
 	public void duplicateInsertTest() {
 		int records[] = {39, 39};
 		List<Tuple> insertedTuples = insertTuples(records);
-		tuplesExist(insertedTuples);
+		assertTrue(tuplesExist(insertedTuples));
 	}
-
+	
+	@Test
+	public void testSingleDelete() {
+		int records[] = {44};
+		List<Tuple> insertedTuples = insertTuples(records);
+		assertTrue(tuplesExist(insertedTuples));
+		
+		deleteTuples(insertedTuples);
+		assertFalse(tuplesExist(insertedTuples));
+	}
+	*/
 }
