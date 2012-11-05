@@ -115,6 +115,10 @@ public class BtreeLeafNode extends BtreeNode {
 		
 		return false;
 	}
+	
+	public boolean hasNext() {
+		return _next != null;
+	}
 
 	public BtreeLeafNode getNext() {
 		return _next;
@@ -153,5 +157,13 @@ public class BtreeLeafNode extends BtreeNode {
 	
 	public Value getTupleKey(Tuple tuple) {
 		return tuple.getValue(KEY_INDEX);
+	}
+	
+	public boolean containsTuple(Tuple tuple) {
+		for (Tuple t : _tuples) {
+			if (tuple.equals(t)) return true;
+		}
+		
+		return false;
 	}
 }

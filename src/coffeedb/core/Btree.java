@@ -17,11 +17,15 @@ public class Btree {
 	
 	public BtreeNode findBucket(BtreeNode node, Value key) {
 		if (node.isLeaf()) {
-			return (BtreeLeafNode) node;
+			return node;
 		}
 		
 		BtreeInternalNode internalNode = (BtreeInternalNode) node;
 		return internalNode.getChild(key);
+	}
+	
+	public BtreeLeafNode findLeaf(Value key) {
+		return (BtreeLeafNode) findBucket(_root, key);
 	}
 	
 	private boolean isRoot(BtreeNode node) {
@@ -55,11 +59,15 @@ public class Btree {
 		}
 	}
 	
+	public boolean isEmpty() {
+		return _root.isEmpty();
+	}
+	
 	public void deleteKey(Value key) {
 		BtreeLeafNode leaf = (BtreeLeafNode) findBucket(_root, key);
 		leaf.deleteKey(key);
 		
-		if (leaf.needsMerge()) {
+		if (!isRoot(leaf) && leaf.needsMerge()) {
 			mergeNode(leaf);
 		}
 	}
@@ -332,6 +340,34 @@ public class Btree {
 		}
 		
 		return buffer.toString();
+	}
+	
+	public int getBranchFactor() {
+		return _branchFactor;
+	}
+	
+	public BtreeNode getRoot() {
+		assert (_root != null);
+		return _root;
+	}
+	
+	public int getNumberOfNodes() {
+		LinkedList<BtreeNode> queue = new LinkedList<BtreeNode>();
+		queue.add(_root);
+		int count = 0;
 		
+		while (!queue.isEmpty()) {
+			BtreeNode node = queue.removeFirst();
+			count++;
+			
+			if (node.isLeaf()) continue;
+			
+			BtreeInternalNode internalNode = (BtreeInternalNode) node;
+			for (BtreeNode child : internalNode.getChildren()) {
+				queue.add(child);
+			}
+		}
+		
+		return count;
 	}
 }

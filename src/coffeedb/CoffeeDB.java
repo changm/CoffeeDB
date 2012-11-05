@@ -170,7 +170,7 @@ public class CoffeeDB {
 		
 		System.out.println(btree.toString());
 		
-		for (int i = 0; i < 1; i++) {
+		for (int i = 0; i < 5; i++) {
 			Tuple tuple = Tuple.createTupleAndSchema(i, "test");
 			System.out.println("Deleting tuple: " + tuple);
 			btree.deleteKey(tuple.getValue(0));

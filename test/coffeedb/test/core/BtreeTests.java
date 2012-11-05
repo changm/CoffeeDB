@@ -15,6 +15,7 @@ import org.junit.Test;
 import coffeedb.Tuple;
 import coffeedb.Value;
 import coffeedb.core.Btree;
+import coffeedb.core.BtreeInternalNode;
 import coffeedb.core.BtreeLeafNode;
 import coffeedb.core.BtreeNode;
 
@@ -37,27 +38,29 @@ public class BtreeTests {
 	@After
 	public void tearDown() throws Exception {
 	}
-	/*
+	
 	private void leavesHaveTuplesInOrder(List<Tuple> tuples) {
 		assert (!tuples.isEmpty());
 		Tuple first = tuples.get(0);
 		Value firstKey = first.getValue(0);
 		
 		BtreeLeafNode bucket = _instance.findLeaf(firstKey);
-		for (int i = 0; i < tuples.size(); i++) {
-			if (((i % Btree.BRANCH_FACTOR) == 0) && (i != 0)) {
-				if (bucket.hasNextLeaf()) {
-					bucket = bucket.getNextLeaf();
-					assert (bucket != null);
-				}
+		for (int i = 0; i < tuples.size(); ) {
+			List<Tuple> bucketTuples = bucket.getTuples();
+			
+			for (int j = 0; j < bucketTuples.size(); j++) {
+				Tuple bucketTuple = bucketTuples.get(j);
+				Tuple listTuple = tuples.get(i);
+				assertTrue(bucketTuple.equals(listTuple));
+				i++;
 			}
 			
-			Tuple tuple = tuples.get(i);
-			assertTrue(bucket.containsTuple(tuple));
+			if (bucket.hasNext()) {
+				bucket = bucket.getNext();
+			}
 		}
 	}
 	
-	/*
 	private boolean tuplesExist(List<Tuple> tuples) {
 		for (Tuple t : tuples) {
 			Value key = t.getValue(0);
@@ -84,15 +87,16 @@ public class BtreeTests {
 	public void splitLeafTest() {
 		HashMap<Value, Tuple> insertions = new HashMap<Value, Tuple>();
 		// Force one split
-		for (int i = 0; i <= Btree.BRANCH_FACTOR; i++) {
+		for (int i = 0; i <= _instance.getBranchFactor(); i++) {
 			Tuple tuple = Tuple.createTupleAndSchema(i, "key");
 			Value key = tuple.getValue(0);
 			_instance.addKey(key, tuple);
 			insertions.put(key,  tuple);
 		}
 		
-		BtreeNode root = _instance.getRoot();
-		assertTrue(_instance.getTreeSize() == 3);
+		BtreeInternalNode root = (BtreeInternalNode) _instance.getRoot();
+		assertTrue(_instance.getNumberOfNodes() == 3); 
+		
 		assertTrue(root.getChildren().size() == 2);
 		
 		for (BtreeNode child : root.getChildren()) {
@@ -166,5 +170,17 @@ public class BtreeTests {
 		deleteTuples(insertedTuples);
 		assertFalse(tuplesExist(insertedTuples));
 	}
-	*/
+	
+	@Test
+	public void deleteAllTuples() {
+		int records[] = { 1, 4, 47, 49 };
+		List<Tuple> insertedTuples = insertTuples(records);
+		assertTrue(tuplesExist(insertedTuples));
+		
+		deleteTuples(insertedTuples);
+		assertFalse(tuplesExist(insertedTuples));
+		
+		int numberOfNodes = _instance.getNumberOfNodes();
+		assertTrue(numberOfNodes == 1);
+	}
 }
