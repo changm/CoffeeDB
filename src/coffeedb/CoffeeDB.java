@@ -149,17 +149,6 @@ public class CoffeeDB {
 	public static void usage() {
 	}
 	
-	public static void main(String[] args) 
-		throws InterruptedException {
-		Config config = parseConfig(args);
-		CoffeeDB database = CoffeeDB.getInstance();
-		database.setConfig(config);
-		database.btreeTests();
-		//database.runTests();
-		//database.deleteTests();
-		database.shutdown();
-	}
-
 	private void btreeTests() {
 		Btree btree = new Btree(3);
 		int itemCount = 4;
@@ -178,5 +167,23 @@ public class CoffeeDB {
 		
 		System.out.println("New tree:");
 		System.out.println(btree.toString());
+	}
+	
+	public void createIndexTest() {
+		runQuery("create table test (a int, b int);");
+		runQuery("insert into test values (10, 20);");
+		runQuery("insert into test values (30, 50);");
+		runQuery("select * from test;");
+		
+		runQuery("create index firstCol on test (a);");
+	}
+	
+	public static void main(String[] args) 
+		throws InterruptedException {
+		Config config = parseConfig(args);
+		CoffeeDB database = CoffeeDB.getInstance();
+		database.setConfig(config);
+		database.createIndexTest();
+		database.shutdown();
 	}
 }

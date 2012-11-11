@@ -55,4 +55,9 @@ public class Table implements Serializable {
 	public void insertTuples(List<Tuple> tuples) {
 		_data.addAll(tuples);
 	}
+	
+	public int getColumnIndex(String columnName) {
+		assert (_schema.hasColumn(columnName));
+		return _schema.getIndex(columnName);
+	}
 }

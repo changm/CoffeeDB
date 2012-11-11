@@ -216,6 +216,32 @@ public class Parser {
 
 	private Operator parseCreate() {
 		eat(Token.CREATE);
+		
+		if (isToken(Token.TABLE)) {
+			return parseCreateTable();
+		} else {
+			return parseCreateIndex();
+		}
+	}
+	
+	private Operator parseCreateIndex() {
+		eat(Token.INDEX);
+		String indexName = getIdent();
+		eat(Token.IDENT);
+		eat(Token.ON);
+		
+		String table = getIdent();
+		eat(Token.IDENT);
+		
+		eat(Token.LEFT_PAREN);
+		String column = getIdent();
+		eat(Token.IDENT);
+		eat(Token.RIGHT_PAREN);
+		
+		return new CreateIndexOperator(indexName, table, column);
+	}
+
+	private Operator parseCreateTable() {
 		eat(Token.TABLE);
 		
 		String tableName = getIdent();
@@ -224,7 +250,7 @@ public class Parser {
 		Schema schema = parseParams();
 		eat (Token.RIGHT_PAREN);
 		
-		return new CreateOperator(tableName, schema);
+		return new CreateTableOperator(tableName, schema);
 	}
 
 	private Schema parseParams() {

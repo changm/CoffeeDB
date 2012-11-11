@@ -19,8 +19,10 @@ public enum Token {
 	SET,
 	DROP,
 	TABLE,
+	INDEX,
 	JOIN, 
 	DELETE,
+	ON,
 	
 	// Symbols
 	LEFT_PAREN,

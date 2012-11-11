@@ -6,12 +6,12 @@ import java.util.List;
 import coffeedb.*;
 import coffeedb.types.Type;
 
-public class CreateOperator extends Operator {
+public class CreateTableOperator extends Operator {
 	private String _tableName;
 	private Schema _schema;
 	private boolean _didCreateTable;
 	
-	public CreateOperator(String tableName, Schema schema) {
+	public CreateTableOperator(String tableName, Schema schema) {
 		_schema = schema;
 		_tableName = tableName;
 	}

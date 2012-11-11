@@ -26,7 +26,7 @@ public class QueryPlan {
 	}
 	
 	public void addCreate(String tableName, Schema tableSchema) {
-		CreateOperator createOp = new CreateOperator(tableName, tableSchema);
+		CreateTableOperator createOp = new CreateTableOperator(tableName, tableSchema);
 		addOperator(createOp);
 	}
 
